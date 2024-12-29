@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+}
+
+/* Container for the video feed */
+.video-feed {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory; /* Enable vertical snap behavior */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling for mobile */
+}
+
+/* Each card (video container) */
+.video-card {
+  flex: 0 0 80vh; /* Make each card full viewport height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-align: start; /* Snap to the start of each card */
+  background: #000; /* Optional: Background color for empty space */
+  width: 50%;
+}
