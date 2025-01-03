@@ -86,6 +86,11 @@ export default function TNavbar() {
             Sign Up
           </Button>
         </NavbarItem>
+        <NavbarItem>
+          <Button as={Link} color="warning" href="#" variant="flat">
+            Become A Creator
+          </Button>
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarMenu>
