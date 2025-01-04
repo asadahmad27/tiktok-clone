@@ -26,7 +26,7 @@ const Dashboard = () => {
                 key={video.id}
                 className="relative bg-white shadow-lg rounded-lg p-4"
               >
-                <video className="w-full h-60 object-cover rounded-lg" controls>
+                <video className="w-full h-80 object-cover rounded-lg" controls>
                   <source src={video?.videoUrl} type="video/mp4" />
                 </video>
                 <div className="flex items-center justify-between p-2">

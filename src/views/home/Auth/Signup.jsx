@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import axiosInstance from '../../../AxiosConfig';
+import Layout from '../../../components/mainComponents/Layout';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
@@ -53,54 +54,56 @@ const SignUp = () => {
     };
 
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-100">
-            <form
-                onSubmit={handleSubmit}
-                className="bg-white p-8 rounded-lg shadow-md w-96"
-            >
-                <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
-                {error && <p className="text-red-500 mb-4">{error}</p>}
-                {success && <p className="text-green-500 mb-4">{success}</p>}
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Full Name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full p-3 mb-3 border rounded focus:outline-none"
-                />
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full p-3 mb-3 border rounded focus:outline-none"
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full p-3 mb-3 border rounded focus:outline-none"
-                />
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder="Confirm Password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full p-3 mb-4 border rounded focus:outline-none"
-                />
-                <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+        <Layout>
+            <div className="flex items-center justify-center h-screen bg-gray-100">
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-white p-8 rounded-lg shadow-md w-96"
                 >
-                    Sign Up
-                </button>
-            </form>
-        </div>
+                    <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+                    {error && <p className="text-red-500 mb-4">{error}</p>}
+                    {success && <p className="text-green-500 mb-4">{success}</p>}
+                    <input
+                        type="text"
+                        name="name"
+                        placeholder="Full Name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full p-3 mb-3 border rounded focus:outline-none"
+                    />
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full p-3 mb-3 border rounded focus:outline-none"
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="w-full p-3 mb-3 border rounded focus:outline-none"
+                    />
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        className="w-full p-3 mb-4 border rounded focus:outline-none"
+                    />
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                    >
+                        Sign Up
+                    </button>
+                </form>
+            </div>
+        </Layout>
     );
 };
 
