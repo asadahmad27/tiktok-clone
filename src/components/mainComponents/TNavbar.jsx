@@ -79,10 +79,10 @@ export default function TNavbar() {
 
       <NavbarContent justify="end">
         <NavbarItem className="hidden lg:flex">
-          <Link href="#">Login</Link>
+          <Link to='/login'>Login</Link>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} color="warning" href="#" variant="flat">
+          <Button as={Link} color="warning" to='/signup' variant="flat">
             Sign Up
           </Button>
         </NavbarItem>
@@ -102,8 +102,8 @@ export default function TNavbar() {
                 index === 2
                   ? "warning"
                   : index === menuItems.length - 1
-                  ? "danger"
-                  : "foreground"
+                    ? "danger"
+                    : "foreground"
               }
               href="#"
               size="lg"
