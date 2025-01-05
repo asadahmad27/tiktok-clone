@@ -10,7 +10,9 @@ const UploadVideo = () => {
     <Layout>
       <div className="bg-white shadow-md max-w-[95%] mx-auto h-[85vh] rounded-lg overflow-hidden">
         <div className="flex items-center border-b border-gray-400 ">
-          <p className="w-full text-center p-4 ">All Videos</p>
+          <Link to="/dashboard" className="w-full text-center p-4 ">
+            All Videos
+          </Link>
           <Link to="/upload" className="w-full">
             <p className="w-full text-center border-l border-gray-400 p-4  bg-gray-800 text-white">
               Upload New Video

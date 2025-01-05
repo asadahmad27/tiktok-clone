@@ -208,18 +208,92 @@
 //   );
 // }
 
-"use client";
-
 import { useState, useRef, useEffect } from "react";
 import { Heart, MessageCircle, Share2, Play, Pause } from "lucide-react";
 import { videos } from "./data";
-import VideoFeed from "./VideoFeed";
+import { getVideosForFeed, searchVideosByQuery } from "../../utils/apiServices";
+import { Button } from "@nextui-org/react";
 
 export default function TikTokScroll() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [liked, setLiked] = useState({});
   const [isPlaying, setIsPlaying] = useState({});
+  const [videos, setVideos] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const videoRefs = useRef([]);
+
+  const getFeedVideo = async () => {
+    const resp = await getVideosForFeed();
+    console.log(resp);
+    setVideos(resp?.data);
+  };
+
+  // Fetch comments for the current video
+  const fetchVideoComments = async (videoId) => {
+    try {
+      const resp = await fetchComments(videoId);
+      setComments(resp?.data || []);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  // Handle video search
+  const handleSearch = async () => {
+    try {
+      const res = await searchVideosByQuery(searchQuery);
+      setVideos(res?.data || []);
+    } catch (error) {
+      console.error("Error searching videos:", error);
+    }
+  };
+
+  // Handle liking a video
+  const handleLike = async (videoId) => {
+    try {
+      const isLiked = liked[videoId];
+      const resp = await likeVideo(videoId, !isLiked);
+      if (resp?.status === 200) {
+        setLiked((prev) => ({ ...prev, [videoId]: !prev[videoId] }));
+        setVideos((prev) =>
+          prev.map((video) =>
+            video.id === videoId
+              ? { ...video, likes: video.likes + (isLiked ? -1 : 1) }
+              : video
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error liking video:", error);
+    }
+  };
+
+  // Handle adding a comment
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+    try {
+      const videoId = videos[currentVideoIndex]?.id;
+      const resp = await addComment(videoId, newComment);
+      if (resp?.status === 200) {
+        setComments((prev) => [...prev, resp.data]);
+        setNewComment("");
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+
+  useEffect(() => {
+    getFeedVideo();
+  }, []);
+
+  const serachVideos = async () => {
+    const res = await searchVideosByQuery();
+    console.log(res);
+  };
 
   useEffect(() => {
     //   // if (videoRefs.current.length === videos.length) {
@@ -315,94 +389,110 @@ export default function TikTokScroll() {
   );
 
   return (
-    <div className="flex h-[85vh] bg-gray-100">
-      {/* Video Side */}
-      {/* <VideoFeed /> */}
-      {/* <div className="video-feed">
-        {videos.map((video, index) => (
-          <div
-            key={video.id}
-            style={{ margin: "20px 0" }}
-            className="bg-red-500 video-card"
-          >
-            <video
-              ref={(el) => (videoRefs.current[index] = el)}
-              src={video.videoUrl}
-              controls={false}
-              loop
-              style={{ width: "100%", height: "auto" }}
-              muted // Ensure videos start muted
-            >
-              <source src={video.videoUrl} type="video/mp4" />
-            </video>
-          </div>
-        ))}
-      </div> */}
-      <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory">
-        {videos.map((video, index) => (
-          <VideoPlayer key={video.id} video={video} index={index} />
-        ))}
+    <div>
+      <div className="max-w-[70%] px-12 pt-6">
+        <p className="mb-2 font-semibold">Search</p>
+        <div className="flex items-center mb-8 gap-4">
+          <input
+            type="text"
+            placeholder="Search"
+            className=" w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Button>Search</Button>
+        </div>
       </div>
 
-      {/* Comments and Likes Side */}
-      <div className="w-1/3 bg-white p-4 overflow-y-auto">
-        <div className="flex flex-col h-full">
-          {/* Interaction Buttons */}
-          <div className="flex justify-end space-x-4 mb-4">
-            <button
-              className="flex flex-col items-center"
-              onClick={() => handleLike(videos[currentVideoIndex].id)}
-            >
-              <Heart
-                className={`w-8 h-8 ${
-                  liked[videos[currentVideoIndex].id]
-                    ? "text-red-500 fill-red-500"
-                    : "text-gray-500"
-                }`}
-              />
-              <span className="text-xs">{videos[currentVideoIndex].likes}</span>
-            </button>
-            <button className="flex flex-col items-center">
-              <MessageCircle className="w-8 h-8 text-gray-500" />
-              <span className="text-xs">
-                {videos[currentVideoIndex].comments}
-              </span>
-            </button>
-            <button className="flex flex-col items-center">
-              <Share2 className="w-8 h-8 text-gray-500" />
-              <span className="text-xs">
-                {videos[currentVideoIndex].shares}
-              </span>
-            </button>
-          </div>
+      <div className="flex h-[85vh] bg-gray-100 border border-gray-400">
+        {/* Video Side */}
+        {/* <VideoFeed /> */}
+        {/* <div className="video-feed">
+       {videos.map((video, index) => (
+         <div
+           key={video.id}
+           style={{ margin: "20px 0" }}
+           className="bg-red-500 video-card"
+         >
+           <video
+             ref={(el) => (videoRefs.current[index] = el)}
+             src={video.videoUrl}
+             controls={false}
+             loop
+             style={{ width: "100%", height: "auto" }}
+             muted // Ensure videos start muted
+           >
+             <source src={video.videoUrl} type="video/mp4" />
+           </video>
+         </div>
+       ))}
+     </div> */}
+        <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory">
+          {videos.map((video, index) => (
+            <VideoPlayer key={video.id} video={video} index={index} />
+          ))}
+        </div>
 
-          {/* Comments Section */}
-          <div className="flex-grow overflow-y-auto">
-            <h2 className="font-bold text-lg mb-4">Comments</h2>
-            {[...Array(10)].map((_, index) => (
-              <div key={index} className="flex items-start space-x-2 mb-4">
-                <img
-                  src={`https://i.pravatar.cc/40?img=${index}`}
-                  alt="User Avatar"
-                  className="w-8 h-8 rounded-full"
+        {/* Comments and Likes Side */}
+        <div className="w-1/3 bg-white p-4 overflow-y-auto">
+          <div className="flex flex-col h-full">
+            {/* Interaction Buttons */}
+            <div className="flex justify-end space-x-4 mb-4">
+              <button
+                className="flex flex-col items-center"
+                onClick={() => handleLike(videos[currentVideoIndex].id)}
+              >
+                <Heart
+                  className={`w-8 h-8 ${
+                    liked[videos[currentVideoIndex].id]
+                      ? "text-red-500 fill-red-500"
+                      : "text-gray-500"
+                  }`}
                 />
-                <div>
-                  <p className="font-semibold">@user{index + 1}</p>
-                  <p className="text-sm text-gray-600">
-                    This is a sample comment. Great video!
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+                <span className="text-xs">
+                  {videos[currentVideoIndex].likes}
+                </span>
+              </button>
+              <button className="flex flex-col items-center">
+                <MessageCircle className="w-8 h-8 text-gray-500" />
+                <span className="text-xs">
+                  {videos[currentVideoIndex].comments}
+                </span>
+              </button>
+              <button className="flex flex-col items-center">
+                <Share2 className="w-8 h-8 text-gray-500" />
+                <span className="text-xs">
+                  {videos[currentVideoIndex].shares}
+                </span>
+              </button>
+            </div>
 
-          {/* Comment Input */}
-          <div className="mt-4">
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            {/* Comments Section */}
+            <div className="flex-grow overflow-y-auto">
+              <h2 className="font-bold text-lg mb-4">Comments</h2>
+              {[...Array(10)].map((_, index) => (
+                <div key={index} className="flex items-start space-x-2 mb-4">
+                  <img
+                    src={`https://i.pravatar.cc/40?img=${index}`}
+                    alt="User Avatar"
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div>
+                    <p className="font-semibold">@user{index + 1}</p>
+                    <p className="text-sm text-gray-600">
+                      This is a sample comment. Great video!
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Comment Input */}
+            <div className="mt-4">
+              <input
+                type="text"
+                placeholder="Add a comment..."
+                className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
         </div>
       </div>

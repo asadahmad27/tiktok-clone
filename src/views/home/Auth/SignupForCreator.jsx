@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import axiosInstance from "../../../utils/AxiosConfig";
 import Layout from "../../../components/mainComponents/Layout";
 import { useAuth } from "../../../context/AuthContext";
 import { Switch } from "@nextui-org/react";
 
-const SignUp = () => {
+const SignUpForCreator = () => {
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -19,7 +19,7 @@ const SignUp = () => {
   const [isCreator, setIsCreator] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
-  const { signup, login, signupCreator } = useAuth();
+  const { login, signupCreator, setUser, user } = useAuth();
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -37,51 +37,28 @@ const SignUp = () => {
       return;
     }
 
+    if (user?.username == formData?.username) {
+      setError("Username can't be same!");
+      return;
+    }
+
     try {
-      console.log(isCreator, "isss");
-      if (isCreator) {
-        const response = await signupCreator({
+      setUser(null);
+      const response = await signupCreator({
+        password: formData.password,
+        username: formData?.username,
+      });
+      if (response?.status === 201 || response?.status === 200) {
+        const loginResponse = await login({
+          username: formData.username,
           password: formData.password,
-          username: formData?.username,
         });
-        if (response?.status === 201 || response?.status === 200) {
-          const loginResponse = await login({
-            email: formData.username,
-            password: formData.password,
-          });
-          if (loginResponse?.status === 200 || loginResponse?.status === 201) {
-            navigate("/");
-          }
-        } else {
-          setError("An error occurred. Please try again.");
+        if (loginResponse?.status === 200 || loginResponse?.status === 201) {
+          navigate("/dashboard");
         }
       } else {
-        const response = await signup({
-          password: formData.password,
-          username: formData?.username,
-        });
-        if (response?.status === 201 || response?.status === 200) {
-          const loginResponse = await login({
-            username: formData.username,
-            password: formData.password,
-          });
-          if (loginResponse?.status === 200 || loginResponse?.status === 201) {
-            navigate("/");
-          }
-        } else {
-          setError("An error occurred. Please try again.");
-        }
+        setError("An error occurred. Please try again.");
       }
-
-      // await login({ email: formData.email, password: formData.password });
-
-      // setSuccess("Account created successfully!");
-      // setFormData({ name: "", email: "", password: "", confirmPassword: "" });
-
-      // //   // Navigate to homepage ("/") after success
-      // setTimeout(() => {
-      //   navigate("/");
-      // }, 2000); // Optional delay for showing success message
     } catch (err) {
       setError(
         err.response?.data?.message || "An error occurred. Please try again."
@@ -96,7 +73,9 @@ const SignUp = () => {
           onSubmit={handleSubmit}
           className="bg-white p-8 rounded-lg shadow-md w-96"
         >
-          <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+          <h2 className="text-2xl font-bold mb-4 text-center">
+            Sign Up for Creator
+          </h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           {success && <p className="text-green-500 mb-4">{success}</p>}
           <input
@@ -142,12 +121,15 @@ const SignUp = () => {
             className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 mt-4"
             disabled={loading}
           >
-            Sign Up
+            Become Creator
           </button>
+          <Link to="/login" className=" text-xs text-center">
+            Already a creator, Login Here
+          </Link>
         </form>
       </div>
     </Layout>
   );
 };
 
-export default SignUp;
+export default SignUpForCreator;

@@ -1,12 +1,20 @@
-import { useState, useRef, DragEvent } from "react";
+import { useState, useRef } from "react";
 import { Upload } from "lucide-react";
 import { Button, Input, Textarea } from "@nextui-org/react";
+import axiosInstance from "../../utils/AxiosConfig";
+import { useAuth } from "../../context/AuthContext";
 
 export default function VideoUploadForm() {
+  const { user } = useAuth(); // Extract user information (e.g., creator_id)
+  console.log(user);
+
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [hashtags, setHashtags] = useState([]); // Array to store hashtags
+  const [currentHashtag, setCurrentHashtag] = useState(""); // Input for new hashtag
+  const [videoPreview, setVideoPreview] = useState(""); // For video preview
   const inputRef = useRef(null);
 
   const handleDrag = (e) => {
@@ -24,14 +32,18 @@ export default function VideoUploadForm() {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+      const uploadedFile = e.dataTransfer.files[0];
+      setFile(uploadedFile);
+      setVideoPreview(URL.createObjectURL(uploadedFile)); // Create preview URL
     }
   };
 
   const handleChange = (e) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const uploadedFile = e.target.files[0];
+      setFile(uploadedFile);
+      setVideoPreview(URL.createObjectURL(uploadedFile)); // Create preview URL
     }
   };
 
@@ -39,17 +51,57 @@ export default function VideoUploadForm() {
     inputRef.current?.click();
   };
 
-  const handleSubmit = (e) => {
+  const addHashtag = () => {
+    if (currentHashtag.trim() && !hashtags.includes(currentHashtag.trim())) {
+      setHashtags([...hashtags, currentHashtag.trim()]);
+      setCurrentHashtag(""); // Clear input field
+    }
+  };
+
+  const removeHashtag = (hashtag) => {
+    setHashtags(hashtags.filter((tag) => tag !== hashtag));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return;
-    // Here you would typically handle the file upload
-    console.log("Uploading file:", file);
-    console.log("Title:", title);
-    console.log("Description:", description);
-    // Reset form
-    setFile(null);
-    setTitle("");
-    setDescription("");
+
+    if (!file || !title || !description || hashtags.length === 0) {
+      return alert("Please fill all fields and add at least one hashtag!");
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("creator_id", user?.id); // Append creator_id
+
+      // Append hashtags as a JSON string
+      const hashtagsString = hashtags.join("#");
+      formData.append("hashtags", hashtagsString);
+
+      const response = await axiosInstance.post("/upload/video", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Automatically set by Axios
+        },
+      });
+
+      if (response.status === 200) {
+        alert("Video uploaded successfully!");
+        // Reset form
+        setFile(null);
+        setTitle("");
+        setDescription("");
+        setHashtags([]);
+        setVideoPreview("");
+        navigate("/dashboard");
+      } else {
+        alert("Failed to upload video!");
+      }
+    } catch (error) {
+      console.error("Error uploading video:", error);
+      alert("Error uploading video!");
+    }
   };
 
   return (
@@ -81,6 +133,13 @@ export default function VideoUploadForm() {
               <p className="text-xs text-gray-500">
                 {(file.size / (1024 * 1024)).toFixed(2)} MB
               </p>
+              {videoPreview && (
+                <video
+                  src={videoPreview}
+                  controls
+                  className="mt-2 w-full max-h-32 rounded-lg"
+                />
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -109,9 +168,39 @@ export default function VideoUploadForm() {
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                // className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 required
               />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="hashtags"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Hashtags
+              </label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  id="hashtags"
+                  value={currentHashtag}
+                  onChange={(e) => setCurrentHashtag(e.target.value)}
+                  placeholder="e.g., #fun"
+                />
+                <Button type="button" onClick={addHashtag}>
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {hashtags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="bg-blue-100 text-blue-600 px-2 py-1 rounded-md text-sm cursor-pointer"
+                    onClick={() => removeHashtag(tag)}
+                  >
+                    {tag} ✕
+                  </span>
+                ))}
+              </div>
             </div>
             <div>
               <label
@@ -125,7 +214,6 @@ export default function VideoUploadForm() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                //   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 required
               />
             </div>

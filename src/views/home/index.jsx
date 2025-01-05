@@ -10,11 +10,14 @@ import {
 } from "../../components/mainComponents/Carousel";
 import VideoFeed from "../../components/mainComponents/VideoFeed";
 import { VIDEOS } from "../../utils/data";
+import { useAuth } from "../../context/AuthContext";
 const items = Array.from({ length: 20 }).map((_, i) => ({
   id: i,
   src: `https://picsum.photos/500?idx=${i}`,
 }));
 const HomePage = () => {
+  const { user } = useAuth();
+  console.log(user, "ususu");
   return (
     <Layout>
       {/* <VideoFeed videos={VIDEOS} /> */}

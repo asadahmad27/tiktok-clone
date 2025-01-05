@@ -9,7 +9,8 @@ import {
   NavbarItem,
   Button,
 } from "@nextui-org/react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export const AcmeLogo = () => {
   return (
@@ -26,7 +27,8 @@ export const AcmeLogo = () => {
 
 export default function TNavbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const menuItems = [
     "Profile",
     "Dashboard",
@@ -40,6 +42,13 @@ export default function TNavbar() {
     "Log Out",
   ];
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  // const
+
   return (
     <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent className="sm:hidden" justify="start">
@@ -51,49 +60,58 @@ export default function TNavbar() {
       <NavbarContent className="sm:hidden pr-3" justify="center">
         <NavbarBrand>
           <AcmeLogo />
-          <p className="font-bold text-inherit" >TikTuk</p>
+          <p className="font-bold text-inherit">TikTuk</p>
         </NavbarBrand>
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarBrand>
           <AcmeLogo />
-          <Link className="font-bold text-inherit" to="/">TikTuk</Link>
+          <Link className="font-bold text-inherit" to="/">
+            TikTuk
+          </Link>
         </NavbarBrand>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Features
-          </Link>
-        </NavbarItem>
-        <NavbarItem isActive>
-          <Link aria-current="page" href="#">
-            Customers
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
-        </NavbarItem>
       </NavbarContent>
 
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-          <Link to='/login'>Login</Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color="warning" to='/signup' variant="flat">
-            Sign Up
-          </Button>
-        </NavbarItem>
-        <NavbarItem>
-          <Button as={Link} color="warning" to='/dashboard' variant="flat">
-            Become A Creator
-          </Button>
-        </NavbarItem>
+        {localStorage.getItem("access_token") ? (
+          <div className="flex items-center gap-4">
+            {" "}
+            <NavbarItem className="flex items-center gap-4">
+              <Button
+                as={Link}
+                color="warning"
+                to="/become-creator"
+                variant="flat"
+              >
+                Become A Creator
+              </Button>
+              <NavbarItem className="hidden lg:flex">
+                <p
+                  onClick={() => handleLogout()}
+                  className="text-blue-500 underline cursor-pointer"
+                >
+                  Logout
+                </p>
+                <Link to="/login"></Link>
+              </NavbarItem>
+            </NavbarItem>
+          </div>
+        ) : (
+          <>
+            <NavbarItem className="hidden lg:flex">
+              <Link to="/login">Login</Link>
+            </NavbarItem>
+            <NavbarItem>
+              <Button as={Link} color="warning" to="/signup" variant="flat">
+                Sign Up
+              </Button>
+            </NavbarItem>
+          </>
+        )}
       </NavbarContent>
 
-      <NavbarMenu>
+      {/* <NavbarMenu>
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
             <Link
@@ -102,8 +120,8 @@ export default function TNavbar() {
                 index === 2
                   ? "warning"
                   : index === menuItems.length - 1
-                    ? "danger"
-                    : "foreground"
+                  ? "danger"
+                  : "foreground"
               }
               href="#"
               size="lg"
@@ -112,7 +130,7 @@ export default function TNavbar() {
             </Link>
           </NavbarMenuItem>
         ))}
-      </NavbarMenu>
+      </NavbarMenu> */}
     </Navbar>
   );
 }

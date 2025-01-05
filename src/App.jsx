@@ -1,15 +1,17 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import AppRoutes from "./routes";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { useEffect } from "react";
 
 function App() {
-  return (
-    <>
-      <AppRoutes />
-    </>
-  );
+  const { meAPI } = useAuth();
+  const getMeData = async () => {
+    meAPI && (await meAPI());
+  };
+  useEffect(() => {
+    getMeData();
+  }, []);
+  return <AppRoutes />;
 }
 
 export default App;
