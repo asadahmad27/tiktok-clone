@@ -327,10 +327,6 @@ export default function TikTokScroll() {
     // }
   }, []);
 
-  const handleLike = (videoId) => {
-    setLiked((prev) => ({ ...prev, [videoId]: !prev[videoId] }));
-  };
-
   const handlePlay = (videoId) => {
     console.log("here");
     const video = videoRefs.current[videos.findIndex((v) => v.id === videoId)];
