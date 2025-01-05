@@ -27,7 +27,7 @@ export const AcmeLogo = () => {
 
 export default function TNavbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const menuItems = [
     "Profile",
@@ -78,14 +78,16 @@ export default function TNavbar() {
           <div className="flex items-center gap-4">
             {" "}
             <NavbarItem className="flex items-center gap-4">
-              <Button
-                as={Link}
-                color="warning"
-                to="/become-creator"
-                variant="flat"
-              >
-                Become A Creator
-              </Button>
+              {!user?.is_creator && (
+                <Button
+                  as={Link}
+                  color="warning"
+                  to="/become-creator"
+                  variant="flat"
+                >
+                  Become A Creator
+                </Button>
+              )}
               <NavbarItem className="hidden lg:flex">
                 <p
                   onClick={() => handleLogout()}

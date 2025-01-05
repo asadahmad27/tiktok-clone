@@ -43,7 +43,7 @@ export const videos = [
   {
     id: "5",
     videoUrl:
-      "https://assets.mixkit.co/videos/preview/mixkit-man-under-multicolored-lights-1237-large.mp4",
+      "https://res.cloudinary.com/dptixq5pl/video/upload/v1736014411/wpzxwn8rqp9idcacjyem.mp4",
     username: "@partyvibes",
     description: "Weekend mode: ON 🎉 #party #weekend",
     likes: 9876,

@@ -74,7 +74,7 @@ export default function VideoUploadForm() {
       formData.append("file", file);
       formData.append("title", title);
       formData.append("description", description);
-      formData.append("creator_id", user?.id); // Append creator_id
+      formData.append("creator_id", user?._id); // Append creator_id
 
       // Append hashtags as a JSON string
       const hashtagsString = hashtags.join("#");

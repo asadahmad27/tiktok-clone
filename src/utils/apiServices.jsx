@@ -24,7 +24,22 @@ export const deleteVideoAPI = async (video_id) => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
-    return true;
+    console.log(response);
+    return response;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
+export const getVideoComments = async (video_id) => {
+  try {
+    const response = await axiosInstance.delete(`/video/${video_id}/comments`, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    console.log(response);
+    return response;
   } catch (e) {
     console.log(e);
     return null;
@@ -32,14 +47,11 @@ export const deleteVideoAPI = async (video_id) => {
 };
 export const getVideosForFeed = async () => {
   try {
-    const response = await axiosInstance.get(
-      `/videos/consumer?skip=0&limit=50`,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    const response = await axiosInstance.get(`/videos/consumer`, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
     return response;
   } catch (e) {
     console.log(e);

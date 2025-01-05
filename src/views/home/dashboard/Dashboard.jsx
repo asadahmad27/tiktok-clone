@@ -21,7 +21,7 @@ const Dashboard = () => {
 
   const deleteVideo = async (videoId) => {
     try {
-      const response = await deleteVideoAPI();
+      const response = await deleteVideoAPI(videoId);
       if (response) {
         alert("Video deleted successfully!");
         // Remove the deleted video from the local state
@@ -88,14 +88,14 @@ const Dashboard = () => {
                         Delete
                       </p>
                     </div>
-                    <div className="flex items-center gap-1">
+                    {/* <div className="flex items-center gap-1">
                       <Heart size={16} />
                       <p>{video.likes}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <MessageCircle size={16} />
                       <p>{video.comments}</p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
