@@ -12,6 +12,7 @@
   "dependencies": {
     "@growthops/ext-ts": "^3.4.4",
     "@nextui-org/react": "^2.6.10",
+    "axios": "^1.7.9",
     "framer-motion": "^11.15.0",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
