@@ -218,6 +218,7 @@ import { Button } from "@nextui-org/react";
 
 export default function TikTokScroll() {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [currentVideoId, setCurrentVideoId] = useState(-1);
   const [liked, setLiked] = useState({});
   const [isPlaying, setIsPlaying] = useState({});
   const [videos, setVideos] = useState([]);
@@ -227,17 +228,23 @@ export default function TikTokScroll() {
     const resp = await getVideosForFeed();
     console.log(resp);
 
-    const updated = resp?.data.map((video, index) => {
-      return { ...video, id: index + 1 };
-    });
+    const updated = resp?.data;
     setVideos(updated);
+    //fetch comments for all videos in the feed and update in the videos
+    updated.forEach(async (video) => {
+      const comments = await fetchVideoComments(video.id);
+      video.comments = comments ?? [];
+    });
+
+    console.log(updated);
   };
 
   // Fetch comments for the current video
   const fetchVideoComments = async (videoId) => {
+    if (!videoId) return;
     try {
       const resp = await getVideoComments(videoId);
-      setComments(resp?.data || []);
+      return resp?.data;
     } catch (error) {
       console.error("Error fetching comments:", error);
     }
@@ -246,6 +253,10 @@ export default function TikTokScroll() {
   useEffect(() => {
     getFeedVideo();
   }, []);
+
+  useEffect(() => {
+    fetchVideoComments();
+  }, [currentVideoIndex]);
 
   useEffect(() => {
     //   // if (videoRefs.current.length === videos.length) {
@@ -259,7 +270,11 @@ export default function TikTokScroll() {
       console.log("here");
       entries.forEach((entry) => {
         const video = entry.target;
-        console.log(video, "videooooo");
+        // setCurrentVideoIndex(index);
+        // const videoId = videos[index]?.id;
+        // if (videoId !== currentVideoId) {
+        //   setCurrentVideoId(videoId); // Update current video ID
+        // }
         if (entry.isIntersecting) {
           video.play();
         } else {
@@ -279,6 +294,12 @@ export default function TikTokScroll() {
     };
     // }
   }, [videos]);
+
+  useEffect(() => {
+    if (currentVideoId) {
+      fetchVideoComments(currentVideoId); // Fetch comments when currentVideoId changes
+    }
+  }, [currentVideoId]);
 
   const handleLike = (videoId) => {
     setLiked((prev) => ({ ...prev, [videoId]: !prev[videoId] }));
@@ -321,6 +342,8 @@ export default function TikTokScroll() {
           playsInline
           muted
           data-index={index}
+          id={video?.id}
+          data-url={video.videoUrl} // Store videoUrl in data attribute
         >
           <source src={video?.file_location} type="video/mp4" />
         </video>

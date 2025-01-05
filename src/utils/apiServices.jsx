@@ -31,9 +31,10 @@ export const deleteVideoAPI = async (video_id) => {
     return null;
   }
 };
+
 export const getVideoComments = async (video_id) => {
   try {
-    const response = await axiosInstance.delete(`/video/${video_id}/comments`, {
+    const response = await axiosInstance.get(`/video/${video_id}/comments`, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
