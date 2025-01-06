@@ -442,7 +442,7 @@ export default function TikTokScroll() {
             src={video.file_location}
             loop
             playsInline
-            muted
+            // muted
             autoPlay={isActive}
           />
           <div className="absolute bottom-4 left-4 text-white">
