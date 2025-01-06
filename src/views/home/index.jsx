@@ -25,8 +25,8 @@ const HomePage = () => {
       {/* homepage where videos will be shown in tiktok style in grid 1
         and in grid two, there will be a list of all comments and likes */}
       <div className="bg-white shadow-md max-w-[95%] mx-auto h-[80vh] rounded-lg">
-        {/* <TikTokScroll /> */}
-        <TikScroll />
+        <TikTokScroll />
+        {/* <TikScroll /> */}
       </div>
     </Layout>
   );

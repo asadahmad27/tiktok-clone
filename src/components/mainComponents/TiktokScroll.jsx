@@ -213,15 +213,25 @@
 import { useState, useRef, useEffect } from "react";
 import { Heart, MessageCircle, Share2, Play, Pause } from "lucide-react";
 // import { videos } from "./data";
-import { getVideoComments, getVideosForFeed } from "../../utils/apiServices";
-import { Button } from "@nextui-org/react";
+import {
+  addVideoComment,
+  getVideoComments,
+  getVideosForFeed,
+} from "../../utils/apiServices";
+import { Button, Spinner } from "@nextui-org/react";
+import { useInView } from "react-intersection-observer";
+import { useAuth } from "../../context/AuthContext";
 
 export default function TikTokScroll() {
+  const { user } = useAuth();
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [currentVideoId, setCurrentVideoId] = useState(-1);
   const [liked, setLiked] = useState({});
+  const [currentVideoComments, setCurrentVideoComments] = useState([]);
   const [isPlaying, setIsPlaying] = useState({});
   const [videos, setVideos] = useState([]);
+  const [likes, setLikes] = useState({});
+  const [commentsLoading, setCommentsLoading] = useState(false);
   const videoRefs = useRef([]);
 
   const getFeedVideo = async () => {
@@ -230,23 +240,22 @@ export default function TikTokScroll() {
 
     const updated = resp?.data;
     setVideos(updated);
-    //fetch comments for all videos in the feed and update in the videos
-    updated.forEach(async (video) => {
-      const comments = await fetchVideoComments(video.id);
-      video.comments = comments ?? [];
-    });
-
-    console.log(updated);
+    setVideos(updated);
   };
 
   // Fetch comments for the current video
   const fetchVideoComments = async (videoId) => {
     if (!videoId) return;
     try {
+      setCommentsLoading(true);
+      // const videoId = videos?.[currentVideoIndex]?.id;
       const resp = await getVideoComments(videoId);
-      return resp?.data;
+      console.log(resp, "iioioip");
+      setCurrentVideoComments(resp);
+      setCommentsLoading(false);
     } catch (error) {
       console.error("Error fetching comments:", error);
+      setCommentsLoading(false);
     }
   };
 
@@ -258,48 +267,78 @@ export default function TikTokScroll() {
     fetchVideoComments();
   }, [currentVideoIndex]);
 
-  useEffect(() => {
-    //   // if (videoRefs.current.length === videos.length) {
-    const options = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.9,
-    };
+  // useEffect(() => {
+  //   //   // if (videoRefs.current.length === videos.length) {
+  //   const options = {
+  //     root: null,
+  //     rootMargin: "0px",
+  //     threshold: 0.9,
+  //   };
 
-    const observer = new IntersectionObserver((entries) => {
-      console.log("here");
-      entries.forEach((entry) => {
-        const video = entry.target;
-        // setCurrentVideoIndex(index);
-        // const videoId = videos[index]?.id;
-        // if (videoId !== currentVideoId) {
-        //   setCurrentVideoId(videoId); // Update current video ID
-        // }
-        if (entry.isIntersecting) {
-          video.play();
-        } else {
-          video.pause();
-        }
+  //   const observer = new IntersectionObserver((entries) => {
+  //     console.log("here");
+  //     entries.forEach((entry) => {
+  //       const video = entry.target;
+  //       // setCurrentVideoIndex(index);
+  //       // const videoId = videos[index]?.id;
+  //       // if (videoId !== currentVideoId) {
+  //       //   setCurrentVideoId(videoId); // Update current video ID
+  //       // }
+  //       if (entry.isIntersecting) {
+  //         video.play();
+  //       } else {
+  //         video.pause();
+  //       }
+  //     });
+  //   }, options);
+
+  //   videoRefs.current.forEach((videoRef) => {
+  //     if (videoRef) observer.observe(videoRef);
+  //   });
+
+  //   return () => {
+  //     videoRefs.current.forEach((videoRef) => {
+  //       if (videoRef) observer.unobserve(videoRef);
+  //     });
+  //   };
+  //   // }
+  // }, [videos]);
+
+  // useEffect(() => {
+  //   if (currentVideoId) {
+  //     fetchVideoComments(currentVideoId); // Fetch comments when currentVideoId changes
+  //   }
+  // }, [currentVideoId]);
+
+  const handleAddComment = async (video_id, commentText) => {
+    if (!commentText.trim()) return;
+
+    try {
+      const response = await addVideoComment(video_id, commentText, user?._id);
+      const newComment = response?.data;
+
+      // Update the state with the new comment
+      const cc = currentVideoComments;
+      cc.push({
+        content: newComment?.content,
+        user_id: newComment?.user_id,
+        video_id: newComment?.video_id,
+        created_at: newComment?.created_at,
       });
-    }, options);
-
-    videoRefs.current.forEach((videoRef) => {
-      if (videoRef) observer.observe(videoRef);
-    });
-
-    return () => {
-      videoRefs.current.forEach((videoRef) => {
-        if (videoRef) observer.unobserve(videoRef);
-      });
-    };
-    // }
-  }, [videos]);
-
-  useEffect(() => {
-    if (currentVideoId) {
-      fetchVideoComments(currentVideoId); // Fetch comments when currentVideoId changes
+      setCurrentVideoComments(cc);
+    } catch (error) {
+      console.error(`Error adding comment for video ${video_id}:`, error);
     }
-  }, [currentVideoId]);
+  };
+
+  console.log(currentVideoComments, "sss");
+  // Toggle like for a video
+  // const handleToggleLike = (video_id) => {
+  //     setLikes((prevLikes) => ({
+  //         ...prevLikes,
+  //         [video_id]: !prevLikes[video_id],
+  //     }));
+  // };
 
   const handleLike = (videoId) => {
     setLiked((prev) => ({ ...prev, [videoId]: !prev[videoId] }));
@@ -330,45 +369,85 @@ export default function TikTokScroll() {
     }
   };
 
-  const VideoPlayer = ({ video, index }) => (
-    <div className="snap-start w-full h-full flex items-center justify-center bg-black">
-      <div className="relative w-[340px] h-full">
-        <video
-          ref={(el) => (videoRefs.current[index] = el)}
-          className="w-full h-full object-cover rounded-lg"
-          // src={video?.file_location}
-          // src={video?.videoUrl}
-          loop
-          playsInline
-          muted
-          data-index={index}
-          id={video?.id}
-          data-url={video.videoUrl} // Store videoUrl in data attribute
-        >
-          <source src={video?.file_location} type="video/mp4" />
-        </video>
-        {/* <div className="absolute top-[50%] left-[40%] flex items-center justify-center">
-          <button
-            onClick={() => togglePlayPause(video.id)}
-            className="bg-black bg-opacity-50 rounded-full p-4 transition-opacity duration-300 opacity-0 hover:opacity-100"
-          >
-            {isPlaying[video.id] ? (
-              <Pause className="w-8 h-8 text-white" />
-            ) : (
-              <Play className="w-8 h-8 text-white" />
-            )}
-          </button>
-        </div> */}
-        <div className="absolute bottom-4 left-4 text-white">
-          <h3 className="font-bold">{video?.username}</h3>
-          <p className="text-sm">{video?.description}</p>
+  // const VideoPlayer = ({ video, index }) => (
+  // <div className="snap-start w-full h-full flex items-center justify-center bg-black">
+  //   <div className="relative w-[340px] h-full">
+  //     <video
+  //       ref={(el) => (videoRefs.current[index] = el)}
+  //       className="w-full h-full object-cover rounded-lg"
+  //       // src={video?.file_location}
+  //       // src={video?.videoUrl}
+  //       loop
+  //       playsInline
+  //       muted
+  //       data-index={index}
+  //       id={video?.id}
+  //       data-url={video.videoUrl} // Store videoUrl in data attribute
+  //     >
+  //       <source src={video?.file_location} type="video/mp4" />
+  //     </video>
+  //     {/* <div className="absolute top-[50%] left-[40%] flex items-center justify-center">
+  //       <button
+  //         onClick={() => togglePlayPause(video.id)}
+  //         className="bg-black bg-opacity-50 rounded-full p-4 transition-opacity duration-300 opacity-0 hover:opacity-100"
+  //       >
+  //         {isPlaying[video.id] ? (
+  //           <Pause className="w-8 h-8 text-white" />
+  //         ) : (
+  //           <Play className="w-8 h-8 text-white" />
+  //         )}
+  //       </button>
+  //     </div> */}
+  // <div className="absolute bottom-4 left-4 text-white">
+  //   <h3 className="font-bold">{video?.username}</h3>
+  //   <p className="text-sm">{video?.description}</p>
+  // </div>
+  //   </div>
+  // </div>
+  // );
+
+  const VideoPlayer = ({ video, index, isActive, onVisible }) => {
+    const { ref, inView } = useInView({
+      threshold: 0.9, // Trigger when 90% of the video is visible
+      rootMargin: "0px",
+    });
+
+    useEffect(() => {
+      if (inView) {
+        console.log("invieww", index);
+        onVisible(); // Notify parent component when video is in view
+      }
+    }, [inView, onVisible]);
+
+    return (
+      <div
+        ref={ref}
+        className="snap-start w-full h-full flex items-center justify-center bg-black"
+      >
+        <div className="relative w-[340px] h-full">
+          <video
+            className="w-full h-full object-cover rounded-lg"
+            src={video.file_location}
+            loop
+            playsInline
+            muted
+            autoPlay={isActive}
+          />
+          <div className="absolute bottom-4 left-4 text-white">
+            <h3 className="font-bold">{video?.username}</h3>
+            <p className="text-sm">{video?.description}</p>
+            <p className="text-sm font-bold">{video?.hashtags}</p>
+          </div>
+          {/* <div className="video-details">
+            <h3>{video.username}</h3>
+            <p>{video.description}</p>
+          </div> */}
         </div>
       </div>
-    </div>
-  );
-
+    );
+  };
   return (
-    <div>
+    <div className="h-full">
       <div className="max-w-[70%] px-12 pt-6">
         <p className="mb-2 font-semibold">Search</p>
         <div className="flex items-center mb-8 gap-4">
@@ -380,32 +459,21 @@ export default function TikTokScroll() {
           <Button>Search</Button>
         </div>
       </div>
-      <div className="flex h-[80vh] bg-gray-100">
-        {/* Video Side */}
-        {/* <VideoFeed /> */}
-        {/* <div className="video-feed">
-        {videos.map((video, index) => (
-          <div
-            key={video.id}
-            style={{ margin: "20px 0" }}
-            className="bg-red-500 video-card"
-          >
-            <video
-              ref={(el) => (videoRefs.current[index] = el)}
-              src={video.videoUrl}
-              controls={false}
-              loop
-              style={{ width: "100%", height: "auto" }}
-              muted // Ensure videos start muted
-            >
-              <source src={video.videoUrl} type="video/mp4" />
-            </video>
-          </div>
-        ))}
-      </div> */}
-        <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory">
+      <div className="flex h-[70vh]  bg-gray-100 overflow-scroll">
+        <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory h-[550px]">
           {videos?.map((video, index) => (
-            <VideoPlayer key={video.id} video={video} index={index} />
+            <VideoPlayer
+              key={video.id}
+              video={video}
+              index={index}
+              onVisible={() => {
+                setCurrentVideoIndex(index);
+                // fetchVideoComments(video.id);
+                setCurrentVideoId(video.id);
+                console.log(index, "indexx");
+              }}
+              isActive={currentVideoIndex === index}
+            />
           ))}
         </div>
 
@@ -446,30 +514,48 @@ export default function TikTokScroll() {
             {/* Comments Section */}
             <div className="flex-grow overflow-y-auto">
               <h2 className="font-bold text-lg mb-4">Comments</h2>
-              {[...Array(10)].map((_, index) => (
-                <div key={index} className="flex items-start space-x-2 mb-4">
-                  <img
-                    src={`https://i.pravatar.cc/40?img=${index}`}
-                    alt="User Avatar"
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <div>
-                    <p className="font-semibold">@user{index + 1}</p>
-                    <p className="text-sm text-gray-600">
-                      This is a sample comment. Great video!
-                    </p>
+
+              {commentsLoading ? (
+                <>
+                  <Spinner />
+                  <p>Loading Comments</p>
+                </>
+              ) : (
+                currentVideoComments?.map((_, index) => (
+                  <div key={index} className="flex items-start space-x-2 mb-4">
+                    <img
+                      src={`https://i.pravatar.cc/40?img=${index}`}
+                      alt="User Avatar"
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <div>
+                      <p className="font-semibold">@user{index + 1}</p>
+                      <p className="text-sm text-gray-600">
+                        This is a sample comment. Great video!
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             {/* Comment Input */}
-            <div className="mt-4">
+            <div className="mt-4 flex items-center gap-4">
               <input
                 type="text"
                 placeholder="Add a comment..."
                 className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddComment(
+                      videos[currentVideoIndex]?.id,
+                      e.target.value
+                    );
+                    e.target.value = ""; // Clear input field
+                  }
+                }}
               />
+              {/* <Button >Send</Button> */}
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@ const Layout = ({ children }) => {
   return (
     <div>
       <TNavbar />
-      <div className="p-4 bg-gray-300 h-[94vh] rounded-lg">{children}</div>
+      <div className="p-4 bg-gray-300 min-h-[80vh] rounded-lg">{children}</div>
     </div>
   );
 };
