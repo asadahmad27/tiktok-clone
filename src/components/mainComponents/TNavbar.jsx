@@ -51,23 +51,25 @@ export default function TNavbar() {
 
   return (
     <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
-      <NavbarContent className="sm:hidden" justify="start">
+      {/* <NavbarContent className="sm:hidden" justify="start">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         />
-      </NavbarContent>
+      </NavbarContent> */}
 
-      <NavbarContent className="sm:hidden pr-3" justify="center">
+      <NavbarContent className="flex gap-4" justify="center">
         <NavbarBrand>
           <AcmeLogo />
-          <p className="font-bold text-inherit">TikTuk</p>
-        </NavbarBrand>
-      </NavbarContent>
-
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarBrand>
-          <AcmeLogo />
-          <Link className="font-bold text-inherit" to="/">
+          <Link
+            className="font-bold text-inherit"
+            to={
+              user?.is_admin
+                ? "/admin-dashboard"
+                : user?.is_creator
+                ? "/dashboard"
+                : "/"
+            }
+          >
             TikTuk
           </Link>
         </NavbarBrand>
@@ -78,17 +80,7 @@ export default function TNavbar() {
           <div className="flex items-center gap-4">
             {" "}
             <NavbarItem className="flex items-center gap-4">
-              {!user?.is_creator && (
-                <Button
-                  as={Link}
-                  color="warning"
-                  to="/become-creator"
-                  variant="flat"
-                >
-                  Become A Creator
-                </Button>
-              )}
-              <NavbarItem className="hidden lg:flex">
+              <NavbarItem className="flex">
                 <p
                   onClick={() => handleLogout()}
                   className="text-blue-500 underline cursor-pointer"
@@ -101,7 +93,7 @@ export default function TNavbar() {
           </div>
         ) : (
           <>
-            <NavbarItem className="hidden lg:flex">
+            <NavbarItem className="flex">
               <Link to="/login">Login</Link>
             </NavbarItem>
             <NavbarItem>

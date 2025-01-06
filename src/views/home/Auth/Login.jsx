@@ -66,11 +66,15 @@ const LoginPage = () => {
     // const me = await meAPI();
     if (res?.status == 200) {
       setError("");
-      if (res?.data?.user?.is_creator) {
-        navigate("/dashboard");
+      if (res?.data?.user?.is_admin || res?.data?.user?.username === "admin") {
+        navigate("/admin-dashboard");
       } else {
-        // const me = await meAPI();
-        navigate("/");
+        if (res?.data?.user?.is_creator) {
+          navigate("/dashboard");
+        } else {
+          // const me = await meAPI();
+          navigate("/");
+        }
       }
     } else {
       setError(res?.response?.data?.detail);

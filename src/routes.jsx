@@ -7,17 +7,25 @@ import Logout from "./views/home/Auth/Logout";
 import SignUp from "./views/home/Auth/Signup";
 import PrivateRouting from "./utils/privateRouting";
 import SignUpForCreator from "./views/home/Auth/SignupForCreator";
+import AdminDashboard from "./views/home/dashboard/AdminDashboard";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRouting>
+              <HomePage />
+            </PrivateRouting>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/logout" element={<Logout />} />
         <Route
-          path="/become-creator"
+          path="/creator-signup"
           element={
             <PrivateRouting>
               <SignUpForCreator />
@@ -37,6 +45,15 @@ const AppRoutes = () => {
           element={
             <PrivateRouting>
               <UploadVideo />
+            </PrivateRouting>
+          }
+        />
+
+        <Route
+          path="/admin-dashboard"
+          element={
+            <PrivateRouting>
+              <AdminDashboard />
             </PrivateRouting>
           }
         />

@@ -217,6 +217,7 @@ import {
   addVideoComment,
   getVideoComments,
   getVideosForFeed,
+  searchVideosByQuery,
 } from "../../utils/apiServices";
 import { Button, Spinner } from "@nextui-org/react";
 import { useInView } from "react-intersection-observer";
@@ -232,6 +233,7 @@ export default function TikTokScroll() {
   const [videos, setVideos] = useState([]);
   const [likes, setLikes] = useState({});
   const [commentsLoading, setCommentsLoading] = useState(false);
+  const [searchingQuery, setSearchingQuery] = useState("");
   const videoRefs = useRef([]);
 
   const getFeedVideo = async () => {
@@ -243,6 +245,7 @@ export default function TikTokScroll() {
     setVideos(updated);
   };
 
+  console.log(videos, "videos");
   // Fetch comments for the current video
   const fetchVideoComments = async (videoId) => {
     if (!videoId) return;
@@ -251,7 +254,7 @@ export default function TikTokScroll() {
       // const videoId = videos?.[currentVideoIndex]?.id;
       const resp = await getVideoComments(videoId);
       console.log(resp, "iioioip");
-      setCurrentVideoComments(resp);
+      setCurrentVideoComments(resp?.data ?? []);
       setCommentsLoading(false);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -304,33 +307,42 @@ export default function TikTokScroll() {
   //   // }
   // }, [videos]);
 
-  // useEffect(() => {
-  //   if (currentVideoId) {
-  //     fetchVideoComments(currentVideoId); // Fetch comments when currentVideoId changes
-  //   }
-  // }, [currentVideoId]);
+  useEffect(() => {
+    if (currentVideoId) {
+      fetchVideoComments(currentVideoId); // Fetch comments when currentVideoId changes
+    }
+  }, [currentVideoId]);
 
   const handleAddComment = async (video_id, commentText) => {
     if (!commentText.trim()) return;
 
     try {
-      const response = await addVideoComment(video_id, commentText, user?._id);
+      console.log(video_id, commentText, "<====");
+      const response = await addVideoComment(
+        video_id,
+        commentText,
+        user?._id ?? user?.id
+      );
       const newComment = response?.data;
 
       // Update the state with the new comment
-      const cc = currentVideoComments;
+      const cc = [...currentVideoComments];
       cc.push({
         content: newComment?.content,
-        user_id: newComment?.user_id,
-        video_id: newComment?.video_id,
-        created_at: newComment?.created_at,
+        user_id: newComment?.user?._id,
+        video_id: video_id,
+        created_at: newComment?.timestamp,
+        user_name: user?.username,
       });
+      console.log(cc, "cc");
       setCurrentVideoComments(cc);
     } catch (error) {
       console.error(`Error adding comment for video ${video_id}:`, error);
     }
   };
-
+  useEffect(() => {
+    console.log(currentVideoComments, "sss");
+  }, [currentVideoComments]);
   console.log(currentVideoComments, "sss");
   // Toggle like for a video
   // const handleToggleLike = (video_id) => {
@@ -446,6 +458,24 @@ export default function TikTokScroll() {
       </div>
     );
   };
+
+  const serachVideos = async () => {
+    const res = await searchVideosByQuery(searchingQuery);
+    setVideos(res?.data);
+    setCurrentVideoIndex(-1);
+    // setSearchingQuery("");
+    setCurrentVideoComments([]);
+  };
+
+  useEffect(() => {
+    if (searchingQuery === "") {
+      getFeedVideo();
+    } else {
+      serachVideos();
+    }
+  }, [searchingQuery]);
+
+  console.log(currentVideoIndex, "currentVideoIndex", currentVideoId);
   return (
     <div className="h-full">
       <div className="max-w-[70%] px-12 pt-6">
@@ -454,27 +484,33 @@ export default function TikTokScroll() {
           <input
             type="text"
             placeholder="Search"
+            value={searchingQuery}
             className=" w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setSearchingQuery(e.target.value)}
           />
-          <Button>Search</Button>
+          <Button onClick={serachVideos}>Search</Button>
         </div>
       </div>
       <div className="flex h-[70vh]  bg-gray-100 overflow-scroll">
         <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory h-[550px]">
-          {videos?.map((video, index) => (
-            <VideoPlayer
-              key={video.id}
-              video={video}
-              index={index}
-              onVisible={() => {
-                setCurrentVideoIndex(index);
-                // fetchVideoComments(video.id);
-                setCurrentVideoId(video.id);
-                console.log(index, "indexx");
-              }}
-              isActive={currentVideoIndex === index}
-            />
-          ))}
+          {videos?.length > 0 ? (
+            videos?.map((video, index) => (
+              <VideoPlayer
+                key={video.id}
+                video={video}
+                index={index}
+                onVisible={() => {
+                  setCurrentVideoIndex(index);
+                  // fetchVideoComments(video.id);
+                  setCurrentVideoId(video.id);
+                  console.log(index, "indexx");
+                }}
+                isActive={currentVideoIndex === index}
+              />
+            ))
+          ) : (
+            <p className="text-center text-white">No Videos...</p>
+          )}
         </div>
 
         {/* Comments and Likes Side */}
@@ -497,18 +533,6 @@ export default function TikTokScroll() {
                   {videos?.[currentVideoIndex]?.likes}
                 </span>
               </button>
-              <button className="flex flex-col items-center">
-                <MessageCircle className="w-8 h-8 text-gray-500" />
-                <span className="text-xs">
-                  {videos?.[currentVideoIndex]?.comments}
-                </span>
-              </button>
-              <button className="flex flex-col items-center">
-                <Share2 className="w-8 h-8 text-gray-500" />
-                <span className="text-xs">
-                  {videos?.[currentVideoIndex]?.shares}
-                </span>
-              </button>
             </div>
 
             {/* Comments Section */}
@@ -520,8 +544,8 @@ export default function TikTokScroll() {
                   <Spinner />
                   <p>Loading Comments</p>
                 </>
-              ) : (
-                currentVideoComments?.map((_, index) => (
+              ) : currentVideoComments?.length > 0 ? (
+                currentVideoComments?.map((item, index) => (
                   <div key={index} className="flex items-start space-x-2 mb-4">
                     <img
                       src={`https://i.pravatar.cc/40?img=${index}`}
@@ -529,13 +553,15 @@ export default function TikTokScroll() {
                       className="w-8 h-8 rounded-full"
                     />
                     <div>
-                      <p className="font-semibold">@user{index + 1}</p>
+                      <p className="font-semibold">@{item?.username}</p>
                       <p className="text-sm text-gray-600">
-                        This is a sample comment. Great video!
+                        {item?.content ?? "Great Video!"}
                       </p>
                     </div>
                   </div>
                 ))
+              ) : (
+                <p className="text-center">No Comments</p>
               )}
             </div>
 

@@ -1,22 +1,18 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
-import axiosInstance from "../../../utils/AxiosConfig";
 import Layout from "../../../components/mainComponents/Layout";
 import { useAuth } from "../../../context/AuthContext";
-import { Switch } from "@nextui-org/react";
 
 const SignUpForCreator = () => {
   const [formData, setFormData] = useState({
     name: "",
     username: "",
-    // email: "",
     password: "",
     confirmPassword: "",
   });
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [isCreator, setIsCreator] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate
   const { login, signupCreator, setUser, user } = useAuth();
@@ -37,10 +33,10 @@ const SignUpForCreator = () => {
       return;
     }
 
-    if (user?.username == formData?.username) {
-      setError("Username can't be same!");
-      return;
-    }
+    // if (user?.username == formData?.username) {
+    //   setError("Username can't be same!");
+    //   return;
+    // }
 
     try {
       setUser(null);
@@ -54,7 +50,7 @@ const SignUpForCreator = () => {
           password: formData.password,
         });
         if (loginResponse?.status === 200 || loginResponse?.status === 201) {
-          navigate("/dashboard");
+          navigate("/admin-dashboard");
         }
       } else {
         setError("An error occurred. Please try again.");
@@ -123,9 +119,6 @@ const SignUpForCreator = () => {
           >
             Become Creator
           </button>
-          <Link to="/login" className=" text-xs text-center">
-            Already a creator, Login Here
-          </Link>
         </form>
       </div>
     </Layout>

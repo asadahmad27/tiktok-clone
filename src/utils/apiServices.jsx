@@ -19,6 +19,32 @@ export const getAllVideos = async (creator_id) => {
     return null;
   }
 };
+export const getAllCreators = async () => {
+  try {
+    const response = await axiosInstance.get(`/users?skip=0&limit=50`, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    return response?.data?.filter((user) => user.is_creator);
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
+export const deleteCreator = async (userId) => {
+  try {
+    const response = await axiosInstance.delete(`/users/${userId}`, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    return true;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
 export const deleteVideoAPI = async (video_id) => {
   try {
     const response = await axiosInstance.delete(`/video/${video_id}`, {
@@ -90,7 +116,7 @@ export const getVideosForFeed = async () => {
 
 export const searchVideosByQuery = async (searchTerm) => {
   try {
-    const response = await axiosInstance.post(
+    const response = await axiosInstance.get(
       `/videos/search?query=${searchTerm}`
     );
     return response;

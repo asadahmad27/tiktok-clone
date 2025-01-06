@@ -8,11 +8,11 @@ import { useAuth } from "../../../context/AuthContext";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  console.log(user);
+  console.log(user, "0-0-0-0-");
   const [videos, setVideos] = useState([]);
   const getVideos = async () => {
     try {
-      const response = await getAllVideos(user?._id);
+      const response = await getAllVideos(user?._id ?? user?.id);
       setVideos(response?.data);
     } catch (e) {
       return null;
@@ -43,7 +43,8 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (user?._id) {
+    if (user?._id || user?.id) {
+      console.log("insidddee");
       getVideos();
     }
   }, [user]);
@@ -64,31 +65,35 @@ const Dashboard = () => {
 
         <div className="">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 overflow-scroll pb-16 py-4 h-[80vh]">
-            {videos?.map((video) => (
-              <div
-                key={video.id}
-                className="relative bg-white shadow-lg rounded-lg p-4"
-              >
-                <video className="w-full h-80 object-cover rounded-lg" controls>
-                  <source src={video?.file_location} type="video/mp4" />
-                </video>
-                <div className=" p-2">
-                  <p className="text-md mb-4 font-bold">
-                    {video?.title ?? "No Name"}
-                    <span className="text-xs ml-4">{video?.hashtags}</span>
-                  </p>
-                  <p>{new Date(video?.upload_date).toLocaleDateString()}</p>
-                  <div className="flex justify-between gap-4 mt-4">
-                    <div>
-                      <p
-                        className="text-red-500 underline cursor-pointer"
-                        onClick={() => handleDeleteClick(video.id)}
-                      >
-                        {" "}
-                        Delete
-                      </p>
-                    </div>
-                    {/* <div className="flex items-center gap-1">
+            {videos?.length > 0 ? (
+              videos?.map((video) => (
+                <div
+                  key={video.id}
+                  className="relative bg-white shadow-lg rounded-lg p-4"
+                >
+                  <video
+                    className="w-full h-80 object-cover rounded-lg"
+                    controls
+                  >
+                    <source src={video?.file_location} type="video/mp4" />
+                  </video>
+                  <div className=" p-2">
+                    <p className="text-md mb-4 font-bold">
+                      {video?.title ?? "No Name"}
+                      <span className="text-xs ml-4">{video?.hashtags}</span>
+                    </p>
+                    <p>{new Date(video?.upload_date).toLocaleDateString()}</p>
+                    <div className="flex justify-between gap-4 mt-4">
+                      <div>
+                        <p
+                          className="text-red-500 underline cursor-pointer"
+                          onClick={() => handleDeleteClick(video.id)}
+                        >
+                          {" "}
+                          Delete
+                        </p>
+                      </div>
+                      {/* <div className="flex items-center gap-1">
                       <Heart size={16} />
                       <p>{video.likes}</p>
                     </div>
@@ -96,10 +101,13 @@ const Dashboard = () => {
                       <MessageCircle size={16} />
                       <p>{video.comments}</p>
                     </div> */}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p>No videos found</p>
+            )}
           </div>
         </div>
       </div>
