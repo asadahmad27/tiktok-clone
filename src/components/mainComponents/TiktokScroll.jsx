@@ -439,12 +439,15 @@ export default function TikTokScroll() {
         <div className="relative w-[340px] h-full">
           <video
             className="w-full h-full object-cover rounded-lg"
-            src={video.file_location}
+            // src={video.file_location}
             loop
             playsInline
-            // muted
+            // muted={false}
             autoPlay={isActive}
-          />
+            // controls
+          >
+            <source src={video?.file_location} type="video/mp4" />
+          </video>
           <div className="absolute bottom-4 left-4 text-white">
             <h3 className="font-bold">{video?.username}</h3>
             <p className="text-sm">{video?.description}</p>
