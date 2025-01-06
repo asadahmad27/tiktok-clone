@@ -340,10 +340,6 @@ export default function TikTokScroll() {
       console.error(`Error adding comment for video ${video_id}:`, error);
     }
   };
-  useEffect(() => {
-    console.log(currentVideoComments, "sss");
-  }, [currentVideoComments]);
-  console.log(currentVideoComments, "sss");
   // Toggle like for a video
   // const handleToggleLike = (video_id) => {
   //     setLikes((prevLikes) => ({
@@ -464,6 +460,7 @@ export default function TikTokScroll() {
 
   const serachVideos = async () => {
     const res = await searchVideosByQuery(searchingQuery);
+
     setVideos(res?.data);
     setCurrentVideoIndex(-1);
     // setSearchingQuery("");
@@ -478,7 +475,6 @@ export default function TikTokScroll() {
     }
   }, [searchingQuery]);
 
-  console.log(currentVideoIndex, "currentVideoIndex", currentVideoId);
   return (
     <div className="h-full">
       <div className="max-w-[70%] px-12 pt-6">

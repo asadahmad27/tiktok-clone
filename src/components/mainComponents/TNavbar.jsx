@@ -59,7 +59,6 @@ export default function TNavbar() {
 
       <NavbarContent className="flex gap-4" justify="center">
         <NavbarBrand>
-          <AcmeLogo />
           <Link
             className="font-bold text-inherit"
             to={
