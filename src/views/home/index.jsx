@@ -11,6 +11,7 @@ import {
 import VideoFeed from "../../components/mainComponents/VideoFeed";
 import { VIDEOS } from "../../utils/data";
 import { useAuth } from "../../context/AuthContext";
+import TikScroll from "../../components/mainComponents/TikScroll";
 const items = Array.from({ length: 20 }).map((_, i) => ({
   id: i,
   src: `https://picsum.photos/500?idx=${i}`,
@@ -24,7 +25,8 @@ const HomePage = () => {
       {/* homepage where videos will be shown in tiktok style in grid 1
         and in grid two, there will be a list of all comments and likes */}
       <div className="bg-white shadow-md max-w-[95%] mx-auto h-[80vh] rounded-lg">
-        <TikTokScroll />
+        {/* <TikTokScroll /> */}
+        <TikScroll />
       </div>
     </Layout>
   );

@@ -1,4 +1,6 @@
 import axiosInstance from "./AxiosConfig";
+import qs from "qs"; // Import qs for URL-encoded string conversion
+
 // import { v2 as cloudinary } from 'cloudinary';
 
 export const getAllVideos = async (creator_id) => {
@@ -43,6 +45,32 @@ export const getVideoComments = async (video_id) => {
     return response;
   } catch (e) {
     console.log(e);
+    return null;
+  }
+};
+
+export const addVideoComment = async (video_id, commentText, user_id) => {
+  try {
+    // Prepare the URL-encoded request body
+    const requestBody = qs.stringify({
+      video_id: video_id,
+      content: commentText,
+      user_id: user_id,
+    });
+
+    // Send the POST request
+    const response = await axiosInstance.post(
+      `/video/${video_id}/comment`,
+      requestBody, // Pass the URL-encoded body
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded", // Ensure correct content type
+        },
+      }
+    );
+    return response;
+  } catch (e) {
+    console.error(`Error adding comment to video ${video_id}:`, e);
     return null;
   }
 };
