@@ -51,25 +51,25 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="bg-white shadow-md max-w-[95%] mx-auto h-[85vh] rounded-lg overflow-hidden">
-        <div className="flex items-center border-b border-gray-400 ">
+      <div className="bg-gray-900 min-h-[85vh] mx-auto rounded-lg overflow-hidden">
+        <div className="flex items-center border-b border-gray-700">
           <p className="w-full text-center p-4 bg-gray-800 text-white">
             All Videos
           </p>
           <Link to="/dashboard/upload" className="w-full">
-            <p className="w-full text-center border-l border-gray-400 p-4">
+            <p className="w-full text-center border-l border-gray-700 p-4 text-white bg-gray-800 hover:bg-gray-700 transition-colors">
               Upload New Video
             </p>
           </Link>
         </div>
 
-        <div className="">
+        <div className="bg-gray-900">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 overflow-scroll pb-16 py-4 h-[80vh]">
             {videos?.length > 0 ? (
               videos?.map((video) => (
                 <div
                   key={video.id}
-                  className="relative bg-white shadow-lg rounded-lg p-4"
+                  className="relative bg-gray-800 shadow-xl rounded-lg p-4"
                 >
                   <video
                     className="w-full h-80 object-cover rounded-lg"
@@ -77,36 +77,29 @@ const Dashboard = () => {
                   >
                     <source src={video?.file_location} type="video/mp4" />
                   </video>
-                  <div className=" p-2">
+                  <div className="p-2 text-white">
                     <p className="text-md mb-4 font-bold">
                       {video?.title ?? "No Name"}
-                      <span className="text-xs ml-4">{video?.hashtags}</span>
+                      <span className="text-xs ml-4 text-gray-400">{video?.hashtags}</span>
                     </p>
-                    <p>{new Date(video?.upload_date).toLocaleDateString()}</p>
+                    <p className="text-gray-400">{new Date(video?.upload_date).toLocaleDateString()}</p>
                     <div className="flex justify-between gap-4 mt-4">
                       <div>
                         <p
-                          className="text-red-500 underline cursor-pointer"
+                          className="text-red-400 hover:text-red-300 underline cursor-pointer transition-colors"
                           onClick={() => handleDeleteClick(video.id)}
                         >
-                          {" "}
                           Delete
                         </p>
                       </div>
-                      {/* <div className="flex items-center gap-1">
-                      <Heart size={16} />
-                      <p>{video.likes}</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MessageCircle size={16} />
-                      <p>{video.comments}</p>
-                    </div> */}
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p>No videos found</p>
+              <div className="col-span-full text-center text-gray-400">
+                No videos found
+              </div>
             )}
           </div>
         </div>

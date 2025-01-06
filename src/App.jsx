@@ -6,7 +6,12 @@ import { useEffect } from "react";
 function App() {
   const { meAPI } = useAuth();
   const getMeData = async () => {
-    meAPI && (await meAPI());
+    try {
+      meAPI && (await meAPI());
+    } catch (e) {
+      console.log(e);
+    }
+
   };
   useEffect(() => {
     getMeData();

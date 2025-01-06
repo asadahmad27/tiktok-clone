@@ -50,7 +50,7 @@ export default function TNavbar() {
   // const
 
   return (
-    <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
+    <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen} className="bg-black">
       {/* <NavbarContent className="sm:hidden" justify="start">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -60,16 +60,16 @@ export default function TNavbar() {
       <NavbarContent className="flex gap-4" justify="center">
         <NavbarBrand>
           <Link
-            className="font-bold text-inherit"
+            className="font-bold text-inherit text-white"
             to={
               user?.is_admin
                 ? "/admin-dashboard"
                 : user?.is_creator
-                ? "/dashboard"
-                : "/"
+                  ? "/dashboard"
+                  : "/"
             }
           >
-            TikTuk
+            Tiktok Clone
           </Link>
         </NavbarBrand>
       </NavbarContent>
@@ -92,11 +92,11 @@ export default function TNavbar() {
           </div>
         ) : (
           <>
-            <NavbarItem className="flex">
+            <NavbarItem className="flex text-white">
               <Link to="/login">Login</Link>
             </NavbarItem>
             <NavbarItem>
-              <Button as={Link} color="warning" to="/signup" variant="flat">
+              <Button as={Link} color="primary" to="/signup" variant="flat">
                 Sign Up
               </Button>
             </NavbarItem>

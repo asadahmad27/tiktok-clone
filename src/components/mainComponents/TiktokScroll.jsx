@@ -1,215 +1,5 @@
 // "use client";
 
-// import { useState, useRef, useEffect } from "react";
-// import { Heart, MessageCircle, Share2, Play, Pause } from "lucide-react";
-// import { VIDEOS } from "../../utils/data";
-// import video2 from "../../assets/demo2.mp4";
-// // import { SnapCarousel, SnapItem } from "react-snap-carousel";
-
-// export default function TikTokScroll() {
-//   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
-//   const [liked, setLiked] = useState({});
-//   const [isPlaying, setIsPlaying] = useState({});
-//   const videoRefs = useRef([]);
-
-//   useEffect(() => {
-//     console.log(videoRefs.current);
-//     if (!videoRefs.current.length) return; // Ensure videoRefs are populated
-
-//     const options = {
-//       root: null,
-//       rootMargin: "0px",
-//       threshold: 0.8, // Trigger when 80% of the video is visible
-//     };
-
-//     const observer = new IntersectionObserver((entries) => {
-//       entries.forEach((entry) => {
-//         const video = entry.target;
-//         const index = Number(video.dataset.index);
-//         console.log(`Video ${index} is intersecting: ${entry.isIntersecting}`);
-
-//         if (entry.isIntersecting) {
-//           console.log(`Video ${index} is intersecting`);
-//           setCurrentVideoIndex(index); // Update the current video index
-//           handlePlay(index); // Play the video
-//         } else {
-//           handlePause(index); // Pause the video
-//         }
-//       });
-//     }, options);
-
-//     // Observe each video element
-//     videoRefs.current.forEach((videoRef) => {
-//       if (videoRef) observer.observe(videoRef);
-//     });
-
-//     return () => {
-//       // Cleanup observer
-//       videoRefs.current.forEach((videoRef) => {
-//         if (videoRef) observer.unobserve(videoRef);
-//       });
-//     };
-//   }, [videoRefs]);
-
-//   const handleLike = (videoId) => {
-//     setLiked((prev) => ({ ...prev, [videoId]: !prev[videoId] }));
-//   };
-
-//   const handlePlay = (videoId) => {
-//     console.log(videoRefs.current, "hnsdepla");
-//     const video = videoRefs.current[Videos.findIndex((v) => v.id === videoId)];
-//     if (video) {
-//       video.play();
-//       setIsPlaying((prev) => ({ ...prev, [videoId]: true }));
-//     }
-//   };
-
-//   const handlePause = (videoId) => {
-//     const video = videoRefs.current[VIDEOS.findIndex((v) => v.id === videoId)];
-//     if (video) {
-//       video.pause();
-//       setIsPlaying((prev) => ({ ...prev, [videoId]: false }));
-//     }
-//   };
-
-//   const togglePlayPause = (videoId) => {
-//     if (isPlaying[videoId]) {
-//       handlePause(videoId);
-//     } else {
-//       handlePlay(videoId);
-//     }
-//   };
-
-//   const VideoPlayer = ({ video, index }) => (
-//     <div className="snap-start w-full h-screen flex items-center justify-center bg-black">
-//       <div className="relative w-[340px] h-screen">
-//         <video
-//           ref={(el) => (videoRefs.current[index] = el)}
-//           className="w-full h-full object-cover rounded-lg"
-//           // src={video.videoUrl}
-//           loop
-//           playsInline
-//           // muted
-//           data-index={index}
-//           // autoPlay={}
-//           controls
-//         >
-//           <source src={video.videoUrl} type="video/mp4" className="w-48 h-48" />
-//         </video>
-//         <div className="absolute top-[50%] left-[40%] flex items-center justify-center h-6">
-//           <button
-//             onClick={() => togglePlayPause(video.id)}
-//             className="bg-black bg-opacity-50 rounded-full p-4 transition-opacity duration-300 opacity-0 hover:opacity-100"
-//           >
-//             {isPlaying[video.id] ? (
-//               <Pause className="w-8 h-8 text-white" />
-//             ) : (
-//               <Play className="w-8 h-8 text-white" />
-//             )}
-//           </button>
-//         </div>
-//         {/* <div className="absolute bottom-4 left-4 text-white">
-//           <h3 className="font-bold">{video.username}</h3>
-//           <p className="text-sm">{video.description}</p>
-//         </div> */}
-//       </div>
-//     </div>
-//   );
-
-//   return (
-//     <div className="flex h-full bg-gray-100">
-//       {/* <SnapCarousel
-//         itemsToShow={1}
-//         itemsToScroll={1}
-//         forwardBtnProps={{
-//           style: { display: "none" },
-//         }}
-//         backwardBtnProps={{
-//           style: { display: "none" },
-//         }}
-//         onSnapChange={(index) => setCurrentVideoIndex(index)}
-//       >
-//         {VIDEOS.map((video, index) => (
-//           <SnapItem key={video.id} width="100%" height="100%">
-//             <VideoPlayer video={video} index={index} />
-//           </SnapItem>
-//         ))}
-//       </SnapCarousel> */}
-//       {/* Video Side */}
-//       <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory">
-//         {VIDEOS.map((video, index) => (
-//           <VideoPlayer key={video.id} video={video} index={index} />
-//         ))}
-//       </div>
-
-//       {/* Comments and Likes Side */}
-//       <div className="w-1/3 bg-white p-4 overflow-y-auto">
-//         <div className="flex flex-col h-full">
-//           {/* Interaction Buttons */}
-//           <div className="flex justify-end space-x-4 mb-4">
-//             <button
-//               className="flex flex-col items-center"
-//               onClick={() => handleLike(VIDEOS[currentVideoIndex].id)}
-//             >
-//               <Heart
-//                 className={`w-8 h-8 ${
-//                   liked[VIDEOS[currentVideoIndex].id]
-//                     ? "text-red-500 fill-red-500"
-//                     : "text-gray-500"
-//                 }`}
-//               />
-//               <span className="text-xs">{VIDEOS[currentVideoIndex].likes}</span>
-//             </button>
-//             <button className="flex flex-col items-center">
-//               <MessageCircle className="w-8 h-8 text-gray-500" />
-//               <span className="text-xs">
-//                 {VIDEOS[currentVideoIndex].comments}
-//               </span>
-//             </button>
-//             <button className="flex flex-col items-center">
-//               <Share2 className="w-8 h-8 text-gray-500" />
-//               <span className="text-xs">
-//                 {VIDEOS[currentVideoIndex].shares}
-//               </span>
-//             </button>
-//           </div>
-
-//           {/* Comments Section */}
-//           <div className="flex-grow overflow-y-auto">
-//             <h2 className="font-bold text-lg mb-4">Comments</h2>
-//             {[...Array(10)].map((_, index) => (
-//               <div key={index} className="flex items-start space-x-2 mb-4">
-//                 <img
-//                   src={`https://i.pravatar.cc/40?img=${index}`}
-//                   alt="User Avatar"
-//                   className="w-8 h-8 rounded-full"
-//                 />
-//                 <div>
-//                   <p className="font-semibold">@user{index + 1}</p>
-//                   <p className="text-sm text-gray-600">
-//                     This is a sample comment. Great video!
-//                   </p>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-
-//           {/* Comment Input */}
-//           <div className="mt-4">
-//             <input
-//               type="text"
-//               placeholder="Add a comment..."
-//               className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-"use client";
-
 import { useState, useRef, useEffect } from "react";
 import { Heart, MessageCircle, Share2, Play, Pause } from "lucide-react";
 // import { videos } from "./data";
@@ -265,10 +55,15 @@ export default function TikTokScroll() {
   useEffect(() => {
     getFeedVideo();
   }, []);
-
   useEffect(() => {
-    fetchVideoComments();
-  }, [currentVideoIndex]);
+
+  }, [videos]);
+
+
+
+  // useEffect(() => {
+  //   fetchVideoComments();
+  // }, [currentVideoIndex]);
 
   // useEffect(() => {
   //   //   // if (videoRefs.current.length === videos.length) {
@@ -415,10 +210,46 @@ export default function TikTokScroll() {
   // );
 
   const VideoPlayer = ({ video, index, isActive, onVisible }) => {
+    const videoRef = useRef(null);
+    const [isMuted, setIsMuted] = useState(true);
+
     const { ref, inView } = useInView({
-      threshold: 0.9, // Trigger when 90% of the video is visible
-      rootMargin: "0px",
+      threshold: 0.6,
+      onChange: (inView) => {
+        if (videoRef.current) {
+          if (inView) {
+            videoRef.current.muted = false;
+            videoRef.current.play();
+            setIsMuted(false);
+          } else {
+            videoRef.current.muted = true;
+            videoRef.current.pause();
+            setIsMuted(true);
+          }
+        }
+      }
     });
+
+    // Optional: Add manual mute toggle
+    const toggleMute = (e) => {
+      e.stopPropagation();
+      if (videoRef.current) {
+        const newMutedState = !videoRef.current.muted;
+        videoRef.current.muted = newMutedState;
+        setIsMuted(newMutedState);
+      }
+    };
+
+
+    // const handleVideoClick = () => {
+    //   if (videoRef.current) {
+    //     if (videoRef.current.paused) {
+    //       videoRef.current.play();
+    //     } else {
+    //       videoRef.current.pause();
+    //     }
+    //   }
+    // };
 
     useEffect(() => {
       if (inView) {
@@ -430,28 +261,63 @@ export default function TikTokScroll() {
     return (
       <div
         ref={ref}
-        className="snap-start w-full h-full flex items-center justify-center bg-black"
+        className="snap-start w-full h-full flex items-center justify-center bg-gray-900"
       >
         <div className="relative w-[340px] h-full">
           <video
             className="w-full h-full object-cover rounded-lg"
             // src={video.file_location}
             loop
+            ref={videoRef}
             playsInline
             // muted={false}
-            autoPlay={isActive}
-            // controls
+            autoPlay={true}
+            // onClick={handleVideoClick}
+            muted={isMuted}
+          // controls
           >
             <source src={video?.file_location} type="video/mp4" />
           </video>
-          <div className="absolute bottom-4 left-4 text-white">
-            <h3 className="font-bold">{video?.username}</h3>
-            <p className="text-sm">{video?.description}</p>
-            <p className="text-sm font-bold">{video?.hashtags}</p>
+          <div className="absolute bottom-4 left-4 right-4 p-4 bg-gray-900 bg-opacity-50 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h3 className="text-white font-semibold truncate">{video?.username}</h3>
+                <p className="text-gray-300 text-sm truncate">{video?.hastags}</p>
+                <p className="text-gray-300 text-sm truncate">{video?.description}</p>
+              </div>
+              <div className="flex flex-col items-center space-y-4">
+                <button
+                  onClick={() => handleLike(video.id)}
+                  className={`p-2 rounded-full ${liked[video.id]
+                    ? "bg-red-500 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    }`}
+                >
+                  <Heart size={20} />
+                  <span className="text-xs text-white">{video?.likes}</span>
+                </button>
+                <button className="p-2 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700">
+                  <MessageCircle size={20} />
+                  <span className="text-xs text-white">{video?.comments}</span>
+                </button>
+
+              </div>
+            </div>
           </div>
-          {/* <div className="video-details">
-            <h3>{video.username}</h3>
-            <p>{video.description}</p>
+
+          <button
+            onClick={toggleMute}
+            className="absolute bottom-32 left-4 p-2 bg-gray-800 rounded-full text-white"
+          >
+            {isMuted ? "Unmute" : "Mute"}
+          </button>
+          {/* <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <button
+              onClick={() => togglePlayPause(video.id)}
+              className="p-4 rounded-full bg-gray-900 bg-opacity-50 text-white hover:bg-opacity-70 transition-opacity"
+            >
+              {isPlaying[video.id] ? <Pause size={24} /> : <Play size={24} />}
+            </button>
           </div> */}
         </div>
       </div>
@@ -476,20 +342,8 @@ export default function TikTokScroll() {
   }, [searchingQuery]);
 
   return (
-    <div className="h-full">
-      <div className="max-w-[70%] px-12 pt-6">
-        <p className="mb-2 font-semibold">Search</p>
-        <div className="flex items-center mb-8 gap-4">
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchingQuery}
-            className=" w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setSearchingQuery(e.target.value)}
-          />
-          <Button onClick={serachVideos}>Search</Button>
-        </div>
-      </div>
+    <div className="h-full bg-gray-800 text-white">
+
       <div className="flex h-[70vh]  bg-gray-100 overflow-scroll">
         <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory h-[550px]">
           {videos?.length > 0 ? (
@@ -499,7 +353,7 @@ export default function TikTokScroll() {
                 video={video}
                 index={index}
                 onVisible={() => {
-                  setCurrentVideoIndex(index);
+                  // setCurrentVideoIndex(index);
                   // fetchVideoComments(video.id);
                   setCurrentVideoId(video.id);
                   console.log(index, "indexx");
@@ -513,8 +367,22 @@ export default function TikTokScroll() {
         </div>
 
         {/* Comments and Likes Side */}
-        <div className="w-1/3 bg-white p-4 overflow-y-auto">
-          <div className="flex flex-col h-full">
+        <div className="w-1/3 bg-gray-800 p-4 overflow-y-auto text-white">
+
+          <div className="px-12 pt-6">
+            <p className="mb-2 font-semibold">Search Video</p>
+            <div className="flex items-center mb-8 gap-4">
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchingQuery}
+                className=" w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                onChange={(e) => setSearchingQuery(e.target.value)}
+              />
+              <Button onClick={serachVideos}>Search</Button>
+            </div>
+          </div>
+          <div className="flex flex-col h-[400px]">
             {/* Interaction Buttons */}
             <div className="flex justify-end space-x-4 mb-4">
               <button
@@ -522,11 +390,10 @@ export default function TikTokScroll() {
                 onClick={() => handleLike(videos?.[currentVideoIndex]?.id)}
               >
                 <Heart
-                  className={`w-8 h-8 ${
-                    liked[videos?.[currentVideoIndex]?.id]
-                      ? "text-red-500 fill-red-500"
-                      : "text-gray-500"
-                  }`}
+                  className={`w-8 h-8 ${liked[videos?.[currentVideoIndex]?.id]
+                    ? "text-red-500 fill-red-500"
+                    : "text-gray-500"
+                    }`}
                 />
                 <span className="text-xs">
                   {videos?.[currentVideoIndex]?.likes}
@@ -553,7 +420,7 @@ export default function TikTokScroll() {
                     />
                     <div>
                       <p className="font-semibold">@{item?.username}</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-200">
                         {item?.content ?? "Great Video!"}
                       </p>
                     </div>
@@ -569,7 +436,7 @@ export default function TikTokScroll() {
               <input
                 type="text"
                 placeholder="Add a comment..."
-                className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     handleAddComment(

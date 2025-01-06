@@ -111,114 +111,117 @@ export default function VideoUploadForm() {
       className="space-y-6"
     >
       <div className="flex p-8 pb-2">
-        <div
-          className={` max-w-[50%] mx-auto flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer ${
-            dragActive ? "border-blue-600 bg-blue-50" : "border-gray-300"
-          }`}
-          onDragOver={handleDrag}
-          onDragLeave={handleDrag}
-          onDrop={handleDrop}
-          onClick={onButtonClick}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="video/*"
-            onChange={handleChange}
-            className="hidden"
-          />
-          {file ? (
-            <div className="text-center">
-              <p className="text-sm text-gray-600">{file.name}</p>
-              <p className="text-xs text-gray-500">
-                {(file.size / (1024 * 1024)).toFixed(2)} MB
-              </p>
-              {videoPreview && (
-                <video
-                  src={videoPreview}
-                  controls
-                  className="mt-2 w-full max-h-32 rounded-lg"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              <Upload className="w-10 h-10 mb-3 text-gray-400" />
-              <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                <span className="font-semibold">Click to upload</span> or drag
-                and drop
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                MP4, WebM, or OGG (MAX. 100MB)
-              </p>
-            </div>
-          )}
-        </div>
-        <div className="w-full">
-          <div className="max-w-[70%] mx-auto">
-            <div className="mb-4">
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Title
-              </label>
-              <Input
-                type="text"
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="hashtags"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Hashtags
-              </label>
-              <div className="flex items-center gap-2">
+        <div className="w-full mx-auto">
+          <div
+            className={`mb-6 max-w-[90%]  flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer ${dragActive ? "border-blue-600 bg-blue-50" : "border-gray-300"
+              }`}
+            onDragOver={handleDrag}
+            onDragLeave={handleDrag}
+            onDrop={handleDrop}
+            onClick={onButtonClick}
+          >
+            <input
+              ref={inputRef}
+              type="file"
+              accept="video/*"
+              onChange={handleChange}
+              className="hidden"
+            />
+            {file ? (
+              <div className="text-center">
+                <p className="text-sm text-gray-600">{file.name}</p>
+                <p className="text-xs text-gray-500">
+                  {(file.size / (1024 * 1024)).toFixed(2)} MB
+                </p>
+                {videoPreview && (
+                  <video
+                    src={videoPreview}
+                    controls
+                    className="mt-2 w-full max-h-32 rounded-lg"
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <Upload className="w-10 h-10 mb-3 text-gray-400" />
+                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  <span className="font-semibold">Click to upload</span> or drag
+                  and drop
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  MP4, WebM, or OGG (MAX. 100MB)
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="w-full">
+            <div className="max-w-[70%] mx-auto">
+              <div className="mb-4">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-white"
+                >
+                  Title
+                </label>
                 <Input
                   type="text"
-                  id="hashtags"
-                  value={currentHashtag}
-                  onChange={(e) => setCurrentHashtag(e.target.value)}
-                  placeholder="e.g., #fun"
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
                 />
-                <Button type="button" onClick={addHashtag}>
-                  Add
-                </Button>
               </div>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {hashtags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="bg-blue-100 text-blue-600 px-2 py-1 rounded-md text-sm cursor-pointer"
-                    onClick={() => removeHashtag(tag)}
-                  >
-                    {tag} ✕
-                  </span>
-                ))}
+              <div className="mb-4">
+                <label
+                  htmlFor="hashtags"
+                  className="block text-sm font-medium text-white"
+                >
+                  Hashtags
+                </label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    id="hashtags"
+                    value={currentHashtag}
+                    onChange={(e) => setCurrentHashtag(e.target.value)}
+                    placeholder="e.g., #fun"
+                  />
+                  <Button type="button" onClick={addHashtag}>
+                    Add
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {hashtags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="bg-blue-100 text-blue-600 px-2 py-1 rounded-md text-sm cursor-pointer"
+                      onClick={() => removeHashtag(tag)}
+                    >
+                      {tag} ✕
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Description
-              </label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                required
-              />
+              <div>
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-white"
+                >
+                  Description
+                </label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                  required
+                />
+              </div>
             </div>
           </div>
         </div>
+
+
       </div>
 
       <div>
