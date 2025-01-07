@@ -59,16 +59,12 @@ export const AuthProvider = ({ children }) => {
       data.append("username", credentials?.username);
       data.append("password", credentials.password);
 
-      const response = await axiosInstance.post("/token", data, {
-        headers: {
-          accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+      const response = await axiosInstance.post("/token/", data);
       if (response?.status === 200) {
-        console.log("Login Success", response.data.user);
-        localStorage.setItem("access_token", response.data.access_token);
-        setUser(response.data.user);
+        console.log("Login Success", response.data);
+        localStorage.setItem("access_token", response.data.access);
+        // await meAPI();
+        setUser(response.data);
         return response;
       }
     } catch (err) {
@@ -79,7 +75,7 @@ export const AuthProvider = ({ children }) => {
 
   const meAPI = async () => {
     try {
-      const response = await axiosInstance.get("/users/me");
+      const response = await axiosInstance.get("/users/me/");
       console.log(response, "Me");
       setUser(response?.data);
       return response;
@@ -92,7 +88,7 @@ export const AuthProvider = ({ children }) => {
   const signup = async (credentials) => {
     try {
       const response = await axiosInstance.post(
-        "/register/consumer",
+        "/register/consumer/",
         credentials,
         {
           headers: {

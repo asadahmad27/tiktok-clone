@@ -21,7 +21,7 @@ export const getAllVideos = async (creator_id) => {
 };
 export const getAllCreators = async () => {
   try {
-    const response = await axiosInstance.get(`/users?skip=0&limit=50`, {
+    const response = await axiosInstance.get(`/users/`, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -47,7 +47,7 @@ export const deleteCreator = async (userId) => {
 };
 export const deleteVideoAPI = async (video_id) => {
   try {
-    const response = await axiosInstance.delete(`/video/${video_id}`, {
+    const response = await axiosInstance.delete(`/videos/${video_id}`, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -62,7 +62,7 @@ export const deleteVideoAPI = async (video_id) => {
 
 export const getVideoComments = async (video_id) => {
   try {
-    const response = await axiosInstance.get(`/video/${video_id}/comments`, {
+    const response = await axiosInstance.get(`/videos/${video_id}/comments/`, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -86,7 +86,7 @@ export const addVideoComment = async (video_id, commentText, user_id) => {
 
     // Send the POST request
     const response = await axiosInstance.post(
-      `/video/${video_id}/comment`,
+      `/video/${1}/comment/`,
       requestBody, // Pass the URL-encoded body
       {
         headers: {
@@ -102,10 +102,10 @@ export const addVideoComment = async (video_id, commentText, user_id) => {
 };
 export const getVideosForFeed = async () => {
   try {
-    const response = await axiosInstance.get(`/videos/consumer`, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+    const response = await axiosInstance.get(`/videos/`, {
+      // headers: {
+      //   "Content-Type": "application/x-www-form-urlencoded",
+      // },
     });
     return response;
   } catch (e) {

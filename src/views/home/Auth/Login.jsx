@@ -61,10 +61,10 @@ const LoginPage = () => {
     const res = await login({ username, password });
     if (res?.status == 200) {
       setError("");
-      if (res?.data?.user?.is_admin || res?.data?.user?.username === "admin") {
+      if (res?.data?.is_admin || res?.data?.username === "admin") {
         navigate("/admin-dashboard");
       } else {
-        if (res?.data?.user?.is_creator) {
+        if (res?.data?.is_creator) {
           navigate("/dashboard");
         } else {
           navigate("/");

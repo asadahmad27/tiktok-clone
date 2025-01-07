@@ -31,20 +31,21 @@ export default function TikTokScroll() {
     console.log(resp);
 
     const updated = resp?.data;
-    setVideos(updated);
-    setVideos(updated);
+    setVideos(updated ?? []);
+    // setVideos([]);
   };
 
   console.log(videos, "videos");
   // Fetch comments for the current video
   const fetchVideoComments = async (videoId) => {
-    if (!videoId) return;
+    if (!videoId || videoId < 0) return;
     try {
       setCommentsLoading(true);
       // const videoId = videos?.[currentVideoIndex]?.id;
       const resp = await getVideoComments(videoId);
       console.log(resp, "iioioip");
       setCurrentVideoComments(resp?.data ?? []);
+      // setCurrentVideoComments([]);
       setCommentsLoading(false);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -55,11 +56,7 @@ export default function TikTokScroll() {
   useEffect(() => {
     getFeedVideo();
   }, []);
-  useEffect(() => {
-
-  }, [videos]);
-
-
+  useEffect(() => {}, [videos]);
 
   // useEffect(() => {
   //   fetchVideoComments();
@@ -227,7 +224,7 @@ export default function TikTokScroll() {
             setIsMuted(true);
           }
         }
-      }
+      },
     });
 
     // Optional: Add manual mute toggle
@@ -239,7 +236,6 @@ export default function TikTokScroll() {
         setIsMuted(newMutedState);
       }
     };
-
 
     // const handleVideoClick = () => {
     //   if (videoRef.current) {
@@ -274,24 +270,31 @@ export default function TikTokScroll() {
             autoPlay={true}
             // onClick={handleVideoClick}
             muted={isMuted}
-          // controls
+            // controls
           >
-            <source src={video?.file_location} type="video/mp4" />
+            <source src={video?.url} type="video/mp4" />
           </video>
           <div className="absolute bottom-4 left-4 right-4 p-4 bg-gray-900 bg-opacity-50 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <h3 className="text-white font-semibold truncate">{video?.username}</h3>
-                <p className="text-gray-300 text-sm truncate">{video?.hastags}</p>
-                <p className="text-gray-300 text-sm truncate">{video?.description}</p>
+                <h3 className="text-white font-semibold truncate">
+                  {video?.username}
+                </h3>
+                <p className="text-gray-300 text-sm truncate">
+                  {video?.hastags}
+                </p>
+                <p className="text-gray-300 text-sm truncate">
+                  {video?.description}
+                </p>
               </div>
               <div className="flex flex-col items-center space-y-4">
                 <button
                   onClick={() => handleLike(video.id)}
-                  className={`p-2 rounded-full ${liked[video.id]
-                    ? "bg-red-500 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                    }`}
+                  className={`p-2 rounded-full ${
+                    liked[video.id]
+                      ? "bg-red-500 text-white"
+                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  }`}
                 >
                   <Heart size={20} />
                   <span className="text-xs text-white">{video?.likes}</span>
@@ -300,7 +303,6 @@ export default function TikTokScroll() {
                   <MessageCircle size={20} />
                   <span className="text-xs text-white">{video?.comments}</span>
                 </button>
-
               </div>
             </div>
           </div>
@@ -343,7 +345,6 @@ export default function TikTokScroll() {
 
   return (
     <div className="h-full bg-gray-800 text-white">
-
       <div className="flex h-[70vh]  bg-gray-100 overflow-scroll">
         <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory h-[550px]">
           {videos?.length > 0 ? (
@@ -368,7 +369,6 @@ export default function TikTokScroll() {
 
         {/* Comments and Likes Side */}
         <div className="w-1/3 bg-gray-800 p-4 overflow-y-auto text-white">
-
           <div className="px-12 pt-6">
             <p className="mb-2 font-semibold">Search Video</p>
             <div className="flex items-center mb-8 gap-4">
@@ -390,10 +390,11 @@ export default function TikTokScroll() {
                 onClick={() => handleLike(videos?.[currentVideoIndex]?.id)}
               >
                 <Heart
-                  className={`w-8 h-8 ${liked[videos?.[currentVideoIndex]?.id]
-                    ? "text-red-500 fill-red-500"
-                    : "text-gray-500"
-                    }`}
+                  className={`w-8 h-8 ${
+                    liked[videos?.[currentVideoIndex]?.id]
+                      ? "text-red-500 fill-red-500"
+                      : "text-gray-500"
+                  }`}
                 />
                 <span className="text-xs">
                   {videos?.[currentVideoIndex]?.likes}
