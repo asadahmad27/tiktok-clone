@@ -84,17 +84,12 @@ export const AuthProvider = ({ children }) => {
       return err;
     }
   };
-  console.log(user, "usus");
+
   const signup = async (credentials) => {
     try {
       const response = await axiosInstance.post(
         "/register/consumer/",
-        credentials,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
+        credentials
       );
       console.log(response, "Respo");
       return response;
@@ -106,7 +101,7 @@ export const AuthProvider = ({ children }) => {
   const signupCreator = async (credentials) => {
     try {
       const response = await axiosInstance.post(
-        "/register/creator",
+        "/register/creator/",
         credentials,
         {
           headers: {
@@ -114,7 +109,7 @@ export const AuthProvider = ({ children }) => {
           },
         }
       );
-      console.log(response, "Respo");
+
       return response;
     } catch (err) {
       console.error(err.response?.data?.message || "SIgnup failed.");

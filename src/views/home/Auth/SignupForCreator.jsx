@@ -43,10 +43,6 @@ const SignUpForCreator = () => {
         username: formData?.username,
       });
       if (response?.status === 201 || response?.status === 200) {
-        const loginResponse = await login({
-          username: formData.username,
-          password: formData.password,
-        });
         if (loginResponse?.status === 200 || loginResponse?.status === 201) {
           navigate("/admin-dashboard");
         }
@@ -72,7 +68,9 @@ const SignUpForCreator = () => {
             </h2>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+            {error && (
+              <p className="text-red-500 text-center text-sm">{error}</p>
+            )}
             {success && (
               <p className="text-green-500 text-center text-sm">{success}</p>
             )}

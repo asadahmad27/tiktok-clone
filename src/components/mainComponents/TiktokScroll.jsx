@@ -105,11 +105,12 @@ export default function TikTokScroll() {
     }
   }, [currentVideoId]);
 
+  console.log(user, "user");
   const handleAddComment = async (video_id, commentText) => {
     if (!commentText.trim()) return;
 
     try {
-      console.log(video_id, commentText, "<====");
+      // voyar, white ood
       const response = await addVideoComment(
         video_id,
         commentText,
@@ -121,10 +122,10 @@ export default function TikTokScroll() {
       const cc = [...currentVideoComments];
       cc.push({
         content: newComment?.content,
-        user_id: newComment?.user?._id,
+        user_id: newComment?.user?.id,
         video_id: video_id,
         created_at: newComment?.timestamp,
-        user_name: user?.username,
+        username: user?.username,
       });
       console.log(cc, "cc");
       setCurrentVideoComments(cc);

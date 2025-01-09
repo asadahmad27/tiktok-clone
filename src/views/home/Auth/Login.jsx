@@ -61,6 +61,7 @@ const LoginPage = () => {
     const res = await login({ username, password });
     if (res?.status == 200) {
       setError("");
+      await meAPI();
       if (res?.data?.is_admin || res?.data?.username === "admin") {
         navigate("/admin-dashboard");
       } else {

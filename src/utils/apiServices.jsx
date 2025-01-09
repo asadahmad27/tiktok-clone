@@ -21,12 +21,8 @@ export const getAllVideos = async (creator_id) => {
 };
 export const getAllCreators = async () => {
   try {
-    const response = await axiosInstance.get(`/users/`, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-    return response?.data?.filter((user) => user.is_creator);
+    const response = await axiosInstance.get(`/users/`, {});
+    return response?.data?.results?.filter((user) => user.is_creator);
   } catch (e) {
     console.log(e);
     return null;
@@ -34,11 +30,7 @@ export const getAllCreators = async () => {
 };
 export const deleteCreator = async (userId) => {
   try {
-    const response = await axiosInstance.delete(`/users/${userId}`, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await axiosInstance.delete(`/users/delete/${userId}/`, {});
     return true;
   } catch (e) {
     console.log(e);
@@ -47,11 +39,7 @@ export const deleteCreator = async (userId) => {
 };
 export const deleteVideoAPI = async (video_id) => {
   try {
-    const response = await axiosInstance.delete(`/videos/${video_id}`, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await axiosInstance.delete(`/videos/${video_id}/`, {});
     console.log(response);
     return response;
   } catch (e) {
@@ -78,21 +66,21 @@ export const getVideoComments = async (video_id) => {
 export const addVideoComment = async (video_id, commentText, user_id) => {
   try {
     // Prepare the URL-encoded request body
-    const requestBody = qs.stringify({
+    const requestBody = {
       video_id: video_id,
       content: commentText,
       user_id: user_id,
-    });
+    };
 
     // Send the POST request
     const response = await axiosInstance.post(
-      `/video/${1}/comment/`,
-      requestBody, // Pass the URL-encoded body
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded", // Ensure correct content type
-        },
-      }
+      `/videos/${video_id}/comments/create/`,
+      requestBody // Pass the URL-encoded body
+      // {
+      //   headers: {
+      //     "Content-Type": "application/x-www-form-urlencoded", // Ensure correct content type
+      //   },
+      // }
     );
     return response;
   } catch (e) {
