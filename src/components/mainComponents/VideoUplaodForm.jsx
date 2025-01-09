@@ -15,6 +15,7 @@ export default function VideoUploadForm() {
   const [hashtags, setHashtags] = useState([]); // Array to store hashtags
   const [currentHashtag, setCurrentHashtag] = useState(""); // Input for new hashtag
   const [videoPreview, setVideoPreview] = useState(""); // For video preview
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
 
   const handleDrag = (e) => {
@@ -64,7 +65,7 @@ export default function VideoUploadForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     if (!file || !title || !description || hashtags.length === 0) {
       return alert("Please fill all fields and add at least one hashtag!");
     }
@@ -98,6 +99,8 @@ export default function VideoUploadForm() {
     } catch (error) {
       console.error("Error uploading video:", error);
       alert("Error uploading video!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -224,6 +227,7 @@ export default function VideoUploadForm() {
         <Button
           type="submit"
           className="w-[70%] mx-auto flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          loading={loading}
         >
           Upload Video
         </Button>
