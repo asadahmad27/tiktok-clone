@@ -31,7 +31,7 @@ const SignUp = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
+    setLoading(true);
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords don't match!");
       return;
@@ -52,7 +52,7 @@ const SignUp = () => {
             navigate("/");
           }
         } else {
-          setError("An error occurred. Please try again.");
+          setError("An error occurred. Please try again.", response);
         }
       } else {
         const response = await signup({
@@ -68,13 +68,16 @@ const SignUp = () => {
             navigate("/");
           }
         } else {
-          setError("An error occurred. Please try again.");
+          console.log(response?.response?.data);
+          setError("An error occurred. Please try again.", response);
         }
       }
     } catch (err) {
       setError(
         err.response?.data?.message || "An error occurred. Please try again."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,7 +91,9 @@ const SignUp = () => {
             </h2>
           </div>
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+            {error && (
+              <p className="text-red-500 text-center text-sm">{error}</p>
+            )}
             {success && (
               <p className="text-green-500 text-center text-sm">{success}</p>
             )}
