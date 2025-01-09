@@ -75,14 +75,18 @@ const Dashboard = () => {
                     className="w-full h-80 object-cover rounded-lg"
                     controls
                   >
-                    <source src={video?.file_location} type="video/mp4" />
+                    <source src={video?.url} type="video/mp4" />
                   </video>
                   <div className="p-2 text-white">
                     <p className="text-md mb-4 font-bold">
                       {video?.title ?? "No Name"}
-                      <span className="text-xs ml-4 text-gray-400">{video?.hashtags}</span>
+                      <span className="text-xs ml-4 text-gray-400">
+                        {video?.hashtags}
+                      </span>
                     </p>
-                    <p className="text-gray-400">{new Date(video?.upload_date).toLocaleDateString()}</p>
+                    <p className="text-gray-400">
+                      {new Date(video?.upload_date).toLocaleDateString()}
+                    </p>
                     <div className="flex justify-between gap-4 mt-4">
                       <div>
                         <p

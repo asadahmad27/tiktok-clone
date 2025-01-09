@@ -39,7 +39,7 @@ export const deleteCreator = async (userId) => {
 };
 export const deleteVideoAPI = async (video_id) => {
   try {
-    const response = await axiosInstance.delete(`/videos/${video_id}/`, {});
+    const response = await axiosInstance.delete(`/video/${video_id}/`, {});
     console.log(response);
     return response;
   } catch (e) {
@@ -104,9 +104,7 @@ export const getVideosForFeed = async () => {
 
 export const searchVideosByQuery = async (searchTerm) => {
   try {
-    const response = await axiosInstance.get(
-      `/videos/search?query=${searchTerm}`
-    );
+    const response = await axiosInstance.get(`/videos/search?q=${searchTerm}`);
     return response;
   } catch (e) {
     return null;
