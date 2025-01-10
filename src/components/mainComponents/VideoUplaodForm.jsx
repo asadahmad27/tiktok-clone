@@ -3,6 +3,7 @@ import { Upload } from "lucide-react";
 import { Button, Input, Textarea } from "@nextui-org/react";
 import axiosInstance from "../../utils/AxiosConfig";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function VideoUploadForm() {
   const { user } = useAuth(); // Extract user information (e.g., creator_id)
@@ -17,6 +18,7 @@ export default function VideoUploadForm() {
   const [videoPreview, setVideoPreview] = useState(""); // For video preview
   const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
+  const navigate = useNavigate()
 
   const handleDrag = (e) => {
     e.preventDefault();
