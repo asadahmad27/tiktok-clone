@@ -43,9 +43,9 @@ const SignUpForCreator = () => {
         username: formData?.username,
       });
       if (response?.status === 201 || response?.status === 200) {
-        if (loginResponse?.status === 200 || loginResponse?.status === 201) {
-          navigate("/admin-dashboard");
-        }
+
+        navigate("/admin-dashboard");
+
       } else {
         setError("An error occurred. Please try again.");
       }
