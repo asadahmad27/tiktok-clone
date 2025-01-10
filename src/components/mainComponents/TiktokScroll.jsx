@@ -9,7 +9,7 @@ import {
   getVideosForFeed,
   searchVideosByQuery,
 } from "../../utils/apiServices";
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from "@nextui-org/react";
 import { useInView } from "react-intersection-observer";
 import { useAuth } from "../../context/AuthContext";
 
@@ -24,6 +24,7 @@ export default function TikTokScroll() {
   const [likes, setLikes] = useState({});
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [searchingQuery, setSearchingQuery] = useState("");
+  const [openCommentsModal, setOpenCommentsModal] = useState(false);
   const videoRefs = useRef([]);
 
   const getFeedVideo = async () => {
@@ -56,7 +57,7 @@ export default function TikTokScroll() {
   useEffect(() => {
     getFeedVideo();
   }, []);
-  useEffect(() => {}, [videos]);
+  useEffect(() => { }, [videos]);
 
   // useEffect(() => {
   //   fetchVideoComments();
@@ -170,44 +171,7 @@ export default function TikTokScroll() {
     }
   };
 
-  // const VideoPlayer = ({ video, index }) => (
-  // <div className="snap-start w-full h-full flex items-center justify-center bg-black">
-  //   <div className="relative w-[340px] h-full">
-  //     <video
-  //       ref={(el) => (videoRefs.current[index] = el)}
-  //       className="w-full h-full object-cover rounded-lg"
-  //       // src={video?.file_location}
-  //       // src={video?.videoUrl}
-  //       loop
-  //       playsInline
-  //       muted
-  //       data-index={index}
-  //       id={video?.id}
-  //       data-url={video.videoUrl} // Store videoUrl in data attribute
-  //     >
-  //       <source src={video?.file_location} type="video/mp4" />
-  //     </video>
-  //     {/* <div className="absolute top-[50%] left-[40%] flex items-center justify-center">
-  //       <button
-  //         onClick={() => togglePlayPause(video.id)}
-  //         className="bg-black bg-opacity-50 rounded-full p-4 transition-opacity duration-300 opacity-0 hover:opacity-100"
-  //       >
-  //         {isPlaying[video.id] ? (
-  //           <Pause className="w-8 h-8 text-white" />
-  //         ) : (
-  //           <Play className="w-8 h-8 text-white" />
-  //         )}
-  //       </button>
-  //     </div> */}
-  // <div className="absolute bottom-4 left-4 text-white">
-  //   <h3 className="font-bold">{video?.username}</h3>
-  //   <p className="text-sm">{video?.description}</p>
-  // </div>
-  //   </div>
-  // </div>
-  // );
-
-  const VideoPlayer = ({ video, index, isActive, onVisible }) => {
+  const VideoPlayer = ({ video, index, isActive, onVisible, onCommentsClick }) => {
     const videoRef = useRef(null);
     const [isMuted, setIsMuted] = useState(true);
 
@@ -271,7 +235,7 @@ export default function TikTokScroll() {
             autoPlay={true}
             // onClick={handleVideoClick}
             muted={isMuted}
-            // controls
+          // controls
           >
             <source src={video?.url} type="video/mp4" />
           </video>
@@ -288,29 +252,44 @@ export default function TikTokScroll() {
                   {video?.description}
                 </p>
               </div>
-              <div className="flex flex-col items-center space-y-4">
+
+              {/* Mobile Interaction Buttons */}
+              <div className="absolute right-2 bottom-32 flex flex-col gap-4 md:hidden">
                 <button
+                  className="flex flex-col items-center"
                   onClick={() => handleLike(video.id)}
-                  className={`p-2 rounded-full ${
-                    liked[video.id]
-                      ? "bg-red-500 text-white"
-                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                  }`}
                 >
-                  <Heart size={20} />
+                  <div className="bg-gray-800 rounded-full p-2">
+                    <Heart
+                      className={`w-6 h-6 ${liked[video.id] ? "text-red-500 fill-red-500" : "text-white"
+                        }`}
+                    />
+                  </div>
                   <span className="text-xs text-white">{video?.likes}</span>
                 </button>
-                <button className="p-2 rounded-full bg-gray-800 text-gray-400 hover:bg-gray-700">
-                  <MessageCircle size={20} />
+                <button
+                  className="flex flex-col items-center"
+                  onClick={() => onCommentsClick()}
+                >
+                  <div className="bg-gray-800 rounded-full p-2">
+                    <MessageCircle className="w-6 h-6 text-white" />
+                  </div>
                   <span className="text-xs text-white">{video?.comments}</span>
                 </button>
+                <button className="flex flex-col items-center">
+                  <div className="bg-gray-800 rounded-full p-2">
+                    <Share2 className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-xs text-white">{video?.shares}</span>
+                </button>
               </div>
+
             </div>
           </div>
 
           <button
             onClick={toggleMute}
-            className="absolute bottom-32 left-4 p-2 bg-gray-800 rounded-full text-white"
+            className="absolute bottom-16 left-4 p-2 bg-gray-800 rounded-full text-white"
           >
             {isMuted ? "Unmute" : "Mute"}
           </button>
@@ -346,8 +325,8 @@ export default function TikTokScroll() {
 
   return (
     <div className="h-full bg-gray-800 text-white">
-      <div className="flex h-[70vh]  bg-gray-100 overflow-scroll">
-        <div className="w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory h-[550px]">
+      <div className="flex md:h-[85vh]  bg-gray-700 overflow-scroll">
+        <div className="w-full md:w-2/3 bg-black overflow-y-scroll snap-y snap-mandatory h-[650px]">
           {videos?.length > 0 ? (
             videos?.map((video, index) => (
               <VideoPlayer
@@ -361,6 +340,7 @@ export default function TikTokScroll() {
                   console.log(index, "indexx");
                 }}
                 isActive={currentVideoIndex === index}
+                onCommentsClick={() => setOpenCommentsModal(true)}
               />
             ))
           ) : (
@@ -369,7 +349,7 @@ export default function TikTokScroll() {
         </div>
 
         {/* Comments and Likes Side */}
-        <div className="w-1/3 bg-gray-800 p-4 overflow-y-auto text-white">
+        <div className="hidden md:block w-1/3 bg-gray-800 p-4 overflow-y-auto text-white">
           <div className="px-12 pt-6">
             <p className="mb-2 font-semibold">Search Video</p>
             <div className="flex items-center mb-8 gap-4">
@@ -383,7 +363,7 @@ export default function TikTokScroll() {
               <Button onClick={serachVideos}>Search</Button>
             </div>
           </div>
-          <div className="flex flex-col h-[400px]">
+          <div className="flex flex-col h-[500px]">
             {/* Interaction Buttons */}
             <div className="flex justify-end space-x-4 mb-4">
               <button
@@ -391,11 +371,10 @@ export default function TikTokScroll() {
                 onClick={() => handleLike(videos?.[currentVideoIndex]?.id)}
               >
                 <Heart
-                  className={`w-8 h-8 ${
-                    liked[videos?.[currentVideoIndex]?.id]
-                      ? "text-red-500 fill-red-500"
-                      : "text-gray-500"
-                  }`}
+                  className={`w-8 h-8 ${liked[videos?.[currentVideoIndex]?.id]
+                    ? "text-red-500 fill-red-500"
+                    : "text-gray-500"
+                    }`}
                 />
                 <span className="text-xs">
                   {videos?.[currentVideoIndex]?.likes}
@@ -454,6 +433,65 @@ export default function TikTokScroll() {
           </div>
         </div>
       </div>
+
+      <Modal isOpen={openCommentsModal} onClose={() => setOpenCommentsModal(false)}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Comments</ModalHeader>
+              <ModalBody>
+                <div className="flex-grow overflow-y-auto">
+
+                  {commentsLoading ? (
+                    <>
+                      <Spinner />
+                      <p>Loading Comments</p>
+                    </>
+                  ) : currentVideoComments?.length > 0 ? (
+                    currentVideoComments?.map((item, index) => (
+                      <div key={index} className="flex items-start space-x-2 mb-4">
+                        <img
+                          src={`https://i.pravatar.cc/40?img=${index}`}
+                          alt="User Avatar"
+                          className="w-8 h-8 rounded-full"
+                        />
+                        <div>
+                          <p className="font-semibold">@{item?.username}</p>
+                          <p className="text-sm text-gray-600">
+                            {item?.content ?? "Great Video!"}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center">No Comments</p>
+                  )}
+                </div>
+
+                {/* Comment Input */}
+                <div className="mt-4 flex items-center gap-4">
+                  <input
+                    type="text"
+                    placeholder="Add a comment..."
+                    className="w-full p-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleAddComment(
+                          videos[currentVideoIndex]?.id,
+                          e.target.value
+                        );
+                        e.target.value = ""; // Clear input field
+                      }
+                    }}
+                  />
+                  <Button>Send</Button>
+                </div>
+              </ModalBody>
+
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
