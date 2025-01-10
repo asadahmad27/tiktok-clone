@@ -75,8 +75,8 @@ export default function VideoUploadForm() {
       formData.append("file", file);
       formData.append("title", title);
       formData.append("description", description);
-      // formData.append("creator_id", user?.id); // Append creator_id
-      formData.append("creator_id", 7); // Append creator_id
+      formData.append("creator_id", user?.id); // Append creator_id
+      // formData.append("creator_id", 7); // Append creator_id
 
       // Append hashtags as a JSON string
       const hashtagsString = hashtags.join("#");
@@ -113,9 +113,8 @@ export default function VideoUploadForm() {
       <div className="flex p-8 pb-2">
         <div className="w-full mx-auto">
           <div
-            className={`mb-6 max-w-[90%]  flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer ${
-              dragActive ? "border-blue-600 bg-blue-50" : "border-gray-300"
-            }`}
+            className={`mb-6 max-w-[90%]  flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer ${dragActive ? "border-blue-600 bg-blue-50" : "border-gray-300"
+              }`}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
             onDrop={handleDrop}
