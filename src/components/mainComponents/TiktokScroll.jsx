@@ -25,6 +25,7 @@ export default function TikTokScroll() {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [searchingQuery, setSearchingQuery] = useState("");
   const [openCommentsModal, setOpenCommentsModal] = useState(false);
+  const [showCopiedPopup, setShowCopiedPopup] = useState(false);
   const videoRefs = useRef([]);
 
   const getFeedVideo = async () => {
@@ -171,6 +172,12 @@ export default function TikTokScroll() {
     }
   };
 
+  const handleShare = () => {
+    navigator.clipboard.writeText('https://red-pond-09923991e.4.azurestaticapps.net/');
+    setShowCopiedPopup(true);
+    setTimeout(() => setShowCopiedPopup(false), 2000);
+  };
+
   const VideoPlayer = ({ video, index, isActive, onVisible, onCommentsClick }) => {
     const videoRef = useRef(null);
     const [isMuted, setIsMuted] = useState(true);
@@ -276,7 +283,7 @@ export default function TikTokScroll() {
                   </div>
                   <span className="text-xs text-white">{video?.comments}</span>
                 </button>
-                <button className="flex flex-col items-center">
+                <button className="flex flex-col items-center" onClick={handleShare}>
                   <div className="bg-gray-800 rounded-full p-2">
                     <Share2 className="w-6 h-6 text-white" />
                   </div>
@@ -379,6 +386,10 @@ export default function TikTokScroll() {
                 <span className="text-xs">
                   {videos?.[currentVideoIndex]?.likes}
                 </span>
+              </button>
+              <button className="flex flex-col items-center" onClick={handleShare}>
+
+                <Share2 className="w-8 h-8 text-gray-500" />
               </button>
             </div>
 
@@ -491,6 +502,21 @@ export default function TikTokScroll() {
             </>
           )}
         </ModalContent>
+      </Modal>
+      <Modal isOpen={showCopiedPopup} onClose={() => setShowCopiedPopup(false)}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+
+              <ModalBody className="py-8 ">
+                <p className="text-xl text-center mb-4">Link Copied</p>
+                <Button>Close</Button>
+              </ModalBody>
+
+            </>
+          )}
+        </ModalContent>
+
       </Modal>
     </div>
   );
